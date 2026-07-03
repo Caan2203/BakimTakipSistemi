@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BakimAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0a64013ebeac3c8a116a53e0719617ffa264528c")]
 [assembly: System.Reflection.AssemblyProductAttribute("BakimAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BakimAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

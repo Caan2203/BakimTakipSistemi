@@ -17,12 +17,19 @@ function Bakimlar() {
     const [modalAcik, setModalAcik] = useState(false);
     const [duzenlemeModu, setDuzenlemeModu] = useState(false);
 
-    const [yeniBakim, setYeniBakim] = useState({
+    // İstediğin yeni input alanları ve bakım verileri tek bir state yapısında birleştirildi
+    const [yeniUrun, setYeniUrun] = useState({
         productId: "",
         employeeId: "",
         maintenanceDate: "",
         description: "",
-        status: "Bekliyor"
+        status: "Bekliyor",
+        productCode: "",
+        productName: "",
+        brand: "",
+        model: "",
+        category: "",
+        location: ""
     });
 
     useEffect(() => {
@@ -36,7 +43,6 @@ function Bakimlar() {
             const urunRes = await urunleriGetir();
             const personelRes = await personelleriGetir();
 
-            // API yapınıza göre .data veya doğrudan dönen array'i setleyebilirsiniz
             setBakimlar(bakimRes?.data || bakimRes || []);
             setUrunler(urunRes?.data || urunRes || []);
             setPersoneller(personelRes?.data || personelRes || []);
@@ -46,64 +52,52 @@ function Bakimlar() {
     };
 
     const bakimKaydet = async () => {
-        if (!yeniBakim.productId) {
+        if (!yeniUrun.productId) {
             alert("Ürün seçiniz");
             return;
         }
 
-        if (!yeniBakim.employeeId) {
+        if (!yeniUrun.employeeId) {
             alert("Personel seçiniz");
             return;
         }
 
-        if (!yeniBakim.maintenanceDate) {
+        if (!yeniUrun.maintenanceDate) {
             alert("Tarih seçiniz");
             return;
         }
 
         try {
-            console.log("===== BAKIM KAYDET =====");
-            console.log("productId:", yeniBakim.productId);
-            console.log("employeeId:", yeniBakim.employeeId);
-            console.log("maintenanceDate:", yeniBakim.maintenanceDate);
-            console.log("description:", yeniBakim.description);
-            console.log("status:", yeniBakim.status);
-            console.log("productId tipi:", typeof yeniBakim.productId);
-            console.log("employeeId tipi:", typeof yeniBakim.employeeId);
-            console.log("Gönderilen obje:", yeniBakim);
-
             if (duzenlemeModu) {
-                await bakimGuncelle(yeniBakim.id, yeniBakim);
+                await bakimGuncelle(yeniUrun.id, yeniUrun);
             } else {
-                await bakimEkle(yeniBakim);
+                await bakimEkle(yeniUrun);
             }
 
-            console.log("Kayıt başarılı.");
-
-            setYeniBakim({
+            // 4) Kaydettikten sonra sıfırlama (Belirttiğin gibi tam temizlik)
+            setYeniUrun({
                 productId: "",
                 employeeId: "",
                 maintenanceDate: "",
                 description: "",
-                status: "Bekliyor"
+                status: "Bekliyor",
+                productCode: "",
+                productName: "",
+                brand: "",
+                model: "",
+                category: "",
+                location: ""
             });
 
             setDuzenlemeModu(false);
             setModalAcik(false);
-
             verileriYukle();
         } catch (hata) {
-            console.log("===== HATA =====");
-            console.log("Status:", hata.response?.status);
-            console.log("Response:", hata.response?.data);
-            console.error(hata);
+            console.error("Kayıt esnasında hata oluştu:", hata);
         }
     };
 
-    // İstenilen bakimiSil fonksiyonu
     const bakimiSil = async (id) => {
-        console.log(id);
-
         if (!window.confirm("Silinsin mi?")) return;
 
         try {
@@ -122,12 +116,18 @@ function Bakimlar() {
                     className="btn btn-success"
                     onClick={() => {
                         setDuzenlemeModu(false);
-                        setYeniBakim({
+                        setYeniUrun({
                             productId: "",
                             employeeId: "",
                             maintenanceDate: "",
                             description: "",
-                            status: "Bekliyor"
+                            status: "Bekliyor",
+                            productCode: "",
+                            productName: "",
+                            brand: "",
+                            model: "",
+                            category: "",
+                            location: ""
                         });
                         setModalAcik(true);
                     }}
@@ -141,12 +141,12 @@ function Bakimlar() {
                 <thead className="table-dark">
                     <tr>
                         <th>Sıra No</th>
-                        <th>ID</th>
-                        <th>Ürün</th>
-                        <th>QR</th>
-                        <th>Personel</th>
-                        <th>Tarih</th>
-                        <th>Açıklama</th>
+                        <th>Ürün Kodu</th>
+                        <th>Ürün Adı</th>
+                        <th>Marka</th>
+                        <th>Model</th>
+                        <th>Kategori</th>
+                        <th>Konum</th>
                         <th>Durum</th>
                         <th>İşlemler</th>
                     </tr>
@@ -159,57 +159,61 @@ function Bakimlar() {
                             </td>
                         </tr>
                     ) : (
-                        bakimlar.map((bakim, index) => (
-                            <tr key={bakim.id}>
-                                <td>{index + 1}</td>
-                                <td>{bakim.id}</td>
-                                <td>{bakim.product?.productName}</td>
-                                <td>
-                                    {bakim.product?.qrCode ? (
-                                        <span className="badge bg-success">QR Tanımlı</span>
-                                    ) : (
-                                        <span className="badge bg-danger">QR Yok</span>
-                                    )}
-                                </td>
-                                <td>{bakim.employee?.fullName || `${bakim.employee?.firstName} ${bakim.employee?.lastName}`}</td>
-                                <td>{bakim.maintenanceDate?.substring(0, 10)}</td>
-                                <td>{bakim.description}</td>
-                                <td>
-                                    <span
-                                        className={
-                                            bakim.status === "Tamamlandı"
-                                                ? "badge bg-success"
-                                                : bakim.status === "Devam Ediyor"
-                                                ? "badge bg-warning text-dark"
-                                                : "badge bg-danger"
-                                        }
-                                    >
-                                        {bakim.status}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button
-                                        className="btn btn-warning btn-sm me-2"
-                                        onClick={() => {
-                                            setDuzenlemeModu(true);
-                                            setYeniBakim({
-                                                ...bakim,
-                                                maintenanceDate: bakim.maintenanceDate?.substring(0, 10) || ""
-                                            });
-                                            setModalAcik(true);
-                                        }}
-                                    >
-                                        Düzenle
-                                    </button>
-                                    <button
-                                        className="btn btn-danger btn-sm"
-                                        onClick={() => bakimiSil(bakim.id)}
-                                    >
-                                        Sil
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
+                        bakimlar.map((bakim, index) => {
+                            // Mantıksal Hata Çözümü: Bakıma bağlı olan ürünü id üzerinden buluyoruz
+                            const urun = urunler.find(u => u.id === bakim.productId) || {};
+                            
+                            return (
+                                <tr key={bakim.id}>
+                                    <td>{index + 1}</td>
+                                    <td>{urun.productCode || "-"}</td>
+                                    <td>{urun.productName || "-"}</td>
+                                    <td>{bakim.brand || urun.brand || "-"}</td>
+                                    <td>{bakim.model || urun.model || "-"}</td>
+                                    <td>{bakim.category || urun.category || "-"}</td>
+                                    <td>{bakim.location || urun.location || "-"}</td>
+                                    <td>
+                                        {urun.isInMaintenance ? (
+                                            <span className="badge bg-danger">Bakımda</span>
+                                        ) : (
+                                            <span className="badge bg-success">Aktif</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <button
+                                            className="btn btn-warning btn-sm me-2"
+                                            onClick={() => {
+                                                setDuzenlemeModu(true);
+                                                setModalAcik(true);
+                                                // Düzenleme modunda verileri state'e dolduruyoruz
+                                                setYeniUrun({
+                                                    ...bakim,
+                                                    productCode: urun.productCode || "",
+                                                    productName: urun.productName || ""
+                                                });
+                                            }}
+                                        >
+                                            Düzenle
+                                        </button>
+
+                                        <button
+                                            className="btn btn-danger btn-sm me-2"
+                                            onClick={() => bakimiSil(bakim.id)}
+                                        >
+                                            Sil
+                                        </button>
+
+                                        <button
+                                            className="btn btn-primary btn-sm"
+                                            onClick={() => window.open(`/qr-kod/${urun.qrCode}`, "_blank")}
+                                            disabled={!urun.qrCode}
+                                        >
+                                            QR
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })
                     )}
                 </tbody>
             </table>
@@ -226,32 +230,43 @@ function Bakimlar() {
                                 <button className="btn-close" onClick={() => setModalAcik(false)}></button>
                             </div>
                             <div className="modal-body">
+                                {/* Ürün Seçimi İlişkisi */}
                                 <div className="mb-3">
                                     <label className="form-label">Ürün</label>
                                     <select
                                         className="form-select"
-                                        value={yeniBakim.productId}
-                                        onChange={(e) =>
-                                            setYeniBakim({
-                                                ...yeniBakim,
-                                                productId: Number(e.target.value)
-                                            })
-                                        }
+                                        value={yeniUrun.productId}
+                                        onChange={(e) => {
+                                            const secilenUrunId = Number(e.target.value);
+                                            const u = urunler.find(item => item.id === secilenUrunId) || {};
+                                            setYeniUrun({
+                                                ...yeniUrun,
+                                                productId: secilenUrunId,
+                                                productCode: u.productCode || "",
+                                                productName: u.productName || "",
+                                                brand: u.brand || "",
+                                                model: u.model || "",
+                                                category: u.category || "",
+                                                location: u.location || ""
+                                            });
+                                        }}
                                     >
                                         <option value="">Ürün Seçin</option>
-                                        {urunler.map((urun) => (
-                                            <option key={urun.id} value={urun.id}>{urun.productName}</option>
+                                        {urunler.map((u) => (
+                                            <option key={u.id} value={u.id}>{u.productName}</option>
                                         ))}
                                     </select>
                                 </div>
+
+                                {/* Personel Seçimi */}
                                 <div className="mb-3">
                                     <label className="form-label">Personel</label>
                                     <select
                                         className="form-select"
-                                        value={yeniBakim.employeeId}
+                                        value={yeniUrun.employeeId}
                                         onChange={(e) =>
-                                            setYeniBakim({
-                                                ...yeniBakim,
+                                            setYeniUrun({
+                                                ...yeniUrun,
                                                 employeeId: Number(e.target.value)
                                             })
                                         }
@@ -264,29 +279,93 @@ function Bakimlar() {
                                         ))}
                                     </select>
                                 </div>
+
+                                {/* 3) Modala Eklenen Yeni Input Alanları */}
+                                <div className="mb-2">
+                                    <label className="form-label">Marka</label>
+                                    <input
+                                        className="form-control mb-2"
+                                        placeholder="Marka"
+                                        value={yeniUrun.brand}
+                                        onChange={(e)=>
+                                            setYeniUrun({
+                                                ...yeniUrun,
+                                                brand:e.target.value
+                                            })
+                                        }
+                                    />
+                                </div>
+
+                                <div className="mb-2">
+                                    <label className="form-label">Model</label>
+                                    <input
+                                        className="form-control mb-2"
+                                        placeholder="Model"
+                                        value={yeniUrun.model}
+                                        onChange={(e)=>
+                                            setYeniUrun({
+                                                ...yeniUrun,
+                                                model:e.target.value
+                                            })
+                                        }
+                                    />
+                                </div>
+
+                                <div className="mb-2">
+                                    <label className="form-label">Kategori</label>
+                                    <input
+                                        className="form-control mb-2"
+                                        placeholder="Kategori"
+                                        value={yeniUrun.category}
+                                        onChange={(e)=>
+                                            setYeniUrun({
+                                                ...yeniUrun,
+                                                category:e.target.value
+                                            })
+                                        }
+                                    />
+                                </div>
+
+                                <div className="mb-2">
+                                    <label className="form-label">Konum</label>
+                                    <input
+                                        className="form-control mb-2"
+                                        placeholder="Konum"
+                                        value={yeniUrun.location}
+                                        onChange={(e)=>
+                                            setYeniUrun({
+                                                ...yeniUrun,
+                                                location:e.target.value
+                                            })
+                                        }
+                                    />
+                                </div>
+
                                 <div className="mb-3">
                                     <label className="form-label">Tarih</label>
                                     <input
                                         type="date"
-                                        className="form-input form-control"
-                                        value={yeniBakim.maintenanceDate}
-                                        onChange={(e) => setYeniBakim({ ...yeniBakim, maintenanceDate: e.target.value })}
+                                        className="form-control"
+                                        value={yeniUrun.maintenanceDate}
+                                        onChange={(e) => setYeniUrun({ ...yeniUrun, maintenanceDate: e.target.value })}
                                     />
                                 </div>
+
                                 <div className="mb-3">
                                     <label className="form-label">Açıklama</label>
                                     <textarea
                                         className="form-control"
-                                        value={yeniBakim.description}
-                                        onChange={(e) => setYeniBakim({ ...yeniBakim, description: e.target.value })}
+                                        value={yeniUrun.description}
+                                        onChange={(e) => setYeniUrun({ ...yeniUrun, description: e.target.value })}
                                     ></textarea>
                                 </div>
+
                                 <div className="mb-3">
                                     <label className="form-label">Durum</label>
                                     <select
                                         className="form-select"
-                                        value={yeniBakim.status}
-                                        onChange={(e) => setYeniBakim({ ...yeniBakim, status: e.target.value })}
+                                        value={yeniUrun.status}
+                                        onChange={(e) => setYeniUrun({ ...yeniUrun, status: e.target.value })}
                                     >
                                         <option value="Bekliyor">Bekliyor</option>
                                         <option value="Devam Ediyor">Devam Ediyor</option>

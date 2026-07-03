@@ -328,6 +328,22 @@
   },
   {
     "ContainingType": "BakimAPI.Controllers.ProductsController",
+    "Method": "GetQrImage",
+    "RelativePath": "api/Products/qr-image/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BakimAPI.Controllers.ProductsController",
     "Method": "GetProductByQr",
     "RelativePath": "api/Products/qr/{qrCode}",
     "HttpMethod": "GET",

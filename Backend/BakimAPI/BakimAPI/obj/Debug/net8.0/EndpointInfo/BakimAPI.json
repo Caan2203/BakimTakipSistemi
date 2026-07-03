@@ -598,6 +598,29 @@
           }
         }
       }
+    },
+    "/api/Products/qr-image/{id}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -673,6 +696,10 @@
         "additionalProperties": false
       },
       "Product": {
+        "required": [
+          "productCode",
+          "productName"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -680,14 +707,22 @@
             "format": "int32"
           },
           "productCode": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "productName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "brand": {
             "type": "string",
             "nullable": true
           },
-          "serialNumber": {
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "category": {
             "type": "string",
             "nullable": true
           },
@@ -695,20 +730,12 @@
             "type": "string",
             "nullable": true
           },
-          "maintenancePeriod": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "createdDate": {
-            "type": "string",
-            "format": "date-time"
+          "isInMaintenance": {
+            "type": "boolean"
           },
           "qrCode": {
             "type": "string",
             "nullable": true
-          },
-          "isInMaintenance": {
-            "type": "boolean"
           },
           "maintenances": {
             "type": "array",

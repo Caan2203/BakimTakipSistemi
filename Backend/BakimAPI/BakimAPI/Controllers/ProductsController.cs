@@ -2,6 +2,8 @@
 using BakimAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QRCoder;
+using System.Drawing;
 
 namespace BakimAPI.Controllers
 {
@@ -33,7 +35,9 @@ namespace BakimAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            return await _context.Products
+                .OrderBy(x => x.ProductName)
+                .ToListAsync();
         }
 
         [HttpGet("{id}")]
@@ -59,22 +63,71 @@ namespace BakimAPI.Controllers
 
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, Product product)
         {
             if (id != product.Id)
             {
-                return BadRequest();
+                return BadRequest("ID uyuşmazlığı.");
             }
 
-            _context.Entry(product).State = EntityState.Modified;
+            // 1. Veri tabanındaki mevcut ürünü çekiyoruz
+            var existingProduct = await _context.Products.FindAsync(id);
+            if (existingProduct == null)
+            {
+                return NotFound("Güncellenmek istenen ürün bulunamadı.");
+            }
 
-            await _context.SaveChangesAsync();
+            // 2. QrCode hariç tüm alanları güvenli bir şekilde güncelliyoruz
+            existingProduct.ProductCode = product.ProductCode;
+            existingProduct.ProductName = product.ProductName;
+            existingProduct.Brand = product.Brand;
+            existingProduct.Model = product.Model;
+            existingProduct.Category = product.Category;
+            existingProduct.Location = product.Location;
+            existingProduct.IsInMaintenance = product.IsInMaintenance;
+
+            try
+            {
+                // 3. Değişiklikleri kaydediyoruz
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             return NoContent();
         }
-       
+
+        [HttpGet("qr-image/{id}")]
+        public async Task<IActionResult> GetQrImage(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+
+            if (product == null)
+                return NotFound();
+
+            string qrText = $"http://localhost:5173/product/{product.QrCode}";
+
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrData = qrGenerator.CreateQrCode(qrText, QRCodeGenerator.ECCLevel.Q);
+
+            var pngQr = new PngByteQRCode(qrData);
+
+            byte[] qrBytes = pngQr.GetGraphic(20);
+
+            return File(qrBytes, "image/png");
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
@@ -90,7 +143,11 @@ namespace BakimAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
 
+        private bool ProductExists(int id)
+        {
+            return _context.Products.Any(e => e.Id == id);
         }
     }
 }

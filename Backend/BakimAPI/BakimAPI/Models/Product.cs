@@ -1,26 +1,29 @@
-﻿namespace BakimAPI.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BakimAPI.Models;
+
+public class Product
 {
-    public class Product
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public string ProductCode { get; set; } = string.Empty;
+    [Required]
+    public string ProductCode { get; set; } = "";
 
-        public string ProductName { get; set; } = string.Empty;
+    [Required]
+    public string ProductName { get; set; } = "";
 
-        public string SerialNumber { get; set; } = string.Empty;
+    public string Brand { get; set; } = "";
 
-        public string Location { get; set; } = string.Empty;
+    public string Model { get; set; } = "";
 
-        public int MaintenancePeriod { get; set; }
+    public string Category { get; set; } = "";
 
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public string Location { get; set; } = "";
 
-        public string QrCode { get; set; } = string.Empty;
+    public bool IsInMaintenance { get; set; }
 
-        public bool IsInMaintenance { get; set; } = false;
+    public string QrCode { get; set; } = "";
 
-        // Ürüne ait bakım kayıtları
-        public ICollection<Maintenance> Maintenances { get; set; } = new List<Maintenance>();
-    }
+    public ICollection<Maintenance> Maintenances { get; set; }
+        = new List<Maintenance>();
 }
