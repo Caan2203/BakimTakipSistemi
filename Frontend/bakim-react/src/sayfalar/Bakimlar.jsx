@@ -17,8 +17,9 @@ function Bakimlar() {
     const [modalAcik, setModalAcik] = useState(false);
     const [duzenlemeModu, setDuzenlemeModu] = useState(false);
 
-    // İstediğin yeni input alanları ve bakım verileri tek bir state yapısında birleştirildi
-    const [yeniUrun, setYeniUrun] = useState({
+    // React Warning Çözümü için Başlangıç State'i (Asla undefined olmamalı)
+    const temizFormState = {
+        id: "",
         productId: "",
         employeeId: "",
         maintenanceDate: "",
@@ -30,7 +31,9 @@ function Bakimlar() {
         model: "",
         category: "",
         location: ""
-    });
+    };
+
+    const [yeniUrun, setYeniUrun] = useState(temizFormState);
 
     useEffect(() => {
         verileriYukle();
@@ -68,41 +71,38 @@ function Bakimlar() {
         }
 
         try {
-            const yeniBakim = {
-                productId: Number(yeniUrun.productId),
-                employeeId: Number(yeniUrun.employeeId),
-                maintenanceDate: yeniUrun.maintenanceDate,
-                description: yeniUrun.description,
-                status: yeniUrun.status
-            };
-
+            // Sorun 1 Çözümü: API'deki 400 hatasını engellemek için id eklendi
+          const yeniBakim = {
+    id: yeniUrun.id,
+    productId: Number(yeniUrun.productId),
+    employeeId: Number(yeniUrun.employeeId),
+    maintenanceDate: yeniUrun.maintenanceDate,
+    description: yeniUrun.description,
+    status: yeniUrun.status
+    
+};
+console.log("Gönderilen bakım =", yeniBakim);
+console.log(yeniBakim);
             if (duzenlemeModu) {
                 await bakimGuncelle(yeniUrun.id, yeniBakim);
             } else {
                 await bakimEkle(yeniBakim);
             }
 
-            // Kaydettikten sonra sıfırlama (Belirttiğin gibi tam temizlik)
-            setYeniUrun({
-                productId: "",
-                employeeId: "",
-                maintenanceDate: "",
-                description: "",
-                status: "Bekliyor",
-                productCode: "",
-                productName: "",
-                brand: "",
-                model: "",
-                category: "",
-                location: ""
-            });
-
+            // Kaydettikten sonra tam temizlik
+            setYeniUrun(temizFormState);
             setDuzenlemeModu(false);
             setModalAcik(false);
             verileriYukle();
         } catch (hata) {
-            console.error("Kayıt esnasında hata oluştu:", hata);
-        }
+    console.log(hata);
+
+    console.log(hata.response);
+
+    console.log(hata.response?.data);
+
+    alert(JSON.stringify(hata.response?.data));
+}
     };
 
     const bakimiSil = async (id) => {
@@ -124,19 +124,7 @@ function Bakimlar() {
                     className="btn btn-success"
                     onClick={() => {
                         setDuzenlemeModu(false);
-                        setYeniUrun({
-                            productId: "",
-                            employeeId: "",
-                            maintenanceDate: "",
-                            description: "",
-                            status: "Bekliyor",
-                            productCode: "",
-                            productName: "",
-                            brand: "",
-                            model: "",
-                            category: "",
-                            location: ""
-                        });
+                        setYeniUrun(temizFormState);
                         setModalAcik(true);
                     }}
                 >
@@ -148,15 +136,13 @@ function Bakimlar() {
             <table className="table table-bordered table-hover">
                 <thead className="table-dark">
                     <tr>
-                        <th>Sıra No</th>
-                        <th>Ürün Kodu</th>
-                        <th>Ürün Adı</th>
-                        <th>Marka</th>
-                        <th>Model</th>
-                        <th>Kategori</th>
-                        <th>Konum</th>
-                        <th>Durum</th>
-                        <th>İşlemler</th>
+                     <th>Sıra No</th>
+<th>Ürün Kodu</th>
+<th>Ürün Adı</th>
+<th>Personel</th>
+<th>Bakım Tarihi</th>
+<th>Durum</th>
+<th>İşlemler</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -168,36 +154,60 @@ function Bakimlar() {
                         </tr>
                     ) : (
                         bakimlar.map((bakim, index) => {
-                            // Mantıksal Hata Çözümü: Bakıma bağlı olan ürünü id üzerinden buluyoruz
                             const urun = urunler.find(u => u.id === bakim.productId) || {};
-                            
+                            const personel =
+    personeller.find(p => p.id === bakim.employeeId) || {};
                             return (
                                 <tr key={bakim.id}>
                                     <td>{index + 1}</td>
                                     <td>{urun.productCode || "-"}</td>
                                     <td>{urun.productName || "-"}</td>
-                                    <td>{bakim.brand || urun.brand || "-"}</td>
-                                    <td>{bakim.model || urun.model || "-"}</td>
-                                    <td>{bakim.category || urun.category || "-"}</td>
-                                    <td>{bakim.location || urun.location || "-"}</td>
                                     <td>
-                                        {urun.isInMaintenance ? (
-                                            <span className="badge bg-danger">Bakımda</span>
-                                        ) : (
-                                            <span className="badge bg-success">Aktif</span>
-                                        )}
+    {personel.firstName
+        ? `${personel.firstName} ${personel.lastName}`
+        : "-"}
+</td>
+
+<td>
+    {bakim.maintenanceDate
+        ? new Date(bakim.maintenanceDate).toLocaleDateString("tr-TR")
+        : "-"}
+</td>
+                                    <td>
+                                        <span
+                                            className={
+                                                bakim.status === "Tamamlandı"
+                                                    ? "badge bg-success"
+                                                    : bakim.status === "Devam Ediyor"
+                                                    ? "badge bg-warning text-dark"
+                                                    : "badge bg-danger"
+                                            }
+                                        >
+                                            {bakim.status || "Bekliyor"}
+                                        </span>
                                     </td>
                                     <td>
                                         <button
+                                        
                                             className="btn btn-warning btn-sm me-2"
+                                            
                                             onClick={() => {
+                                                console.log("Bakım =", bakim);
                                                 setDuzenlemeModu(true);
                                                 setModalAcik(true);
-                                                // Düzenleme modunda verileri state'e dolduruyoruz
+                                                
+                                                // Sorun 2 Çözümü: Tarih formatı substring(0,10) ile input'a uygun hale getirildi
                                                 setYeniUrun({
                                                     ...bakim,
+                                                    maintenanceDate: bakim.maintenanceDate
+                                                        ? bakim.maintenanceDate.substring(0, 10)
+                                                        : "",
                                                     productCode: urun.productCode || "",
-                                                    productName: urun.productName || ""
+                                                    productName: urun.productName || "",
+                                                    brand: bakim.brand || urun.brand || "",
+                                                    model: bakim.model || urun.model || "",
+                                                    category: bakim.category || urun.category || "",
+                                                    location: bakim.location || urun.location || ""
                                                 });
                                             }}
                                         >
@@ -243,7 +253,7 @@ function Bakimlar() {
                                     <label className="form-label">Ürün</label>
                                     <select
                                         className="form-select"
-                                        value={yeniUrun.productId}
+                                        value={yeniUrun.productId || ""}
                                         onChange={(e) => {
                                             const secilenUrunId = Number(e.target.value);
                                             const u = urunler.find(item => item.id === secilenUrunId) || {};
@@ -261,7 +271,9 @@ function Bakimlar() {
                                     >
                                         <option value="">Ürün Seçin</option>
                                         {urunler.map((u) => (
-                                            <option key={u.id} value={u.id}>{u.productName}</option>
+                                           <option key={u.id} value={u.id}>
+    {u.productCode} - {u.productName}
+</option>
                                         ))}
                                     </select>
                                 </div>
@@ -271,7 +283,7 @@ function Bakimlar() {
                                     <label className="form-label">Personel</label>
                                     <select
                                         className="form-select"
-                                        value={yeniUrun.employeeId}
+                                        value={yeniUrun.employeeId || ""}
                                         onChange={(e) =>
                                             setYeniUrun({
                                                 ...yeniUrun,
@@ -288,19 +300,14 @@ function Bakimlar() {
                                     </select>
                                 </div>
 
-                                {/* Modala Eklenen Yeni Input Alanları */}
+                                {/* Sorun 3 Çözümü: Uncontrolled uyarısını engellemek için || "" fallbacks eklendi */}
                                 <div className="mb-2">
                                     <label className="form-label">Marka</label>
                                     <input
                                         className="form-control mb-2"
                                         placeholder="Marka"
-                                        value={yeniUrun.brand}
-                                        onChange={(e)=>
-                                            setYeniUrun({
-                                                ...yeniUrun,
-                                                brand:e.target.value
-                                            })
-                                        }
+                                        value={yeniUrun.brand || ""}
+                                        onChange={(e)=> setYeniUrun({ ...yeniUrun, brand: e.target.value })}
                                     />
                                 </div>
 
@@ -309,13 +316,8 @@ function Bakimlar() {
                                     <input
                                         className="form-control mb-2"
                                         placeholder="Model"
-                                        value={yeniUrun.model}
-                                        onChange={(e)=>
-                                            setYeniUrun({
-                                                ...yeniUrun,
-                                                model:e.target.value
-                                            })
-                                        }
+                                        value={yeniUrun.model || ""}
+                                        onChange={(e)=> setYeniUrun({ ...yeniUrun, model: e.target.value })}
                                     />
                                 </div>
 
@@ -324,13 +326,8 @@ function Bakimlar() {
                                     <input
                                         className="form-control mb-2"
                                         placeholder="Kategori"
-                                        value={yeniUrun.category}
-                                        onChange={(e)=>
-                                            setYeniUrun({
-                                                ...yeniUrun,
-                                                category:e.target.value
-                                            })
-                                        }
+                                        value={yeniUrun.category || ""}
+                                        onChange={(e)=> setYeniUrun({ ...yeniUrun, category: e.target.value })}
                                     />
                                 </div>
 
@@ -339,13 +336,8 @@ function Bakimlar() {
                                     <input
                                         className="form-control mb-2"
                                         placeholder="Konum"
-                                        value={yeniUrun.location}
-                                        onChange={(e)=>
-                                            setYeniUrun({
-                                                ...yeniUrun,
-                                                location:e.target.value
-                                            })
-                                        }
+                                        value={yeniUrun.location || ""}
+                                        onChange={(e)=> setYeniUrun({ ...yeniUrun, location: e.target.value })}
                                     />
                                 </div>
 
@@ -354,7 +346,7 @@ function Bakimlar() {
                                     <input
                                         type="date"
                                         className="form-control"
-                                        value={yeniUrun.maintenanceDate}
+                                        value={yeniUrun.maintenanceDate || ""}
                                         onChange={(e) => setYeniUrun({ ...yeniUrun, maintenanceDate: e.target.value })}
                                     />
                                 </div>
@@ -363,7 +355,7 @@ function Bakimlar() {
                                     <label className="form-label">Açıklama</label>
                                     <textarea
                                         className="form-control"
-                                        value={yeniUrun.description}
+                                        value={yeniUrun.description || ""}
                                         onChange={(e) => setYeniUrun({ ...yeniUrun, description: e.target.value })}
                                     ></textarea>
                                 </div>
@@ -372,7 +364,7 @@ function Bakimlar() {
                                     <label className="form-label">Durum</label>
                                     <select
                                         className="form-select"
-                                        value={yeniUrun.status}
+                                        value={yeniUrun.status || "Bekliyor"}
                                         onChange={(e) => setYeniUrun({ ...yeniUrun, status: e.target.value })}
                                     >
                                         <option value="Bekliyor">Bekliyor</option>

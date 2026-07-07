@@ -18,7 +18,7 @@ function GostergePaneli() {
     const verileriGetir = async () => {
         try {
             const urunler = await api.get("/Products");
-            const personeller = await api.get("/Employee");
+            const personeller = await api.get("/Employees");
             const bakimlar = await api.get("/Maintenance");
 
             // Kartlar için sayısal verilerin set edilmesi
