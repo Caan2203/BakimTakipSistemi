@@ -53,15 +53,24 @@ namespace BakimAPI.Controllers
             return product;
         }
 
+        // GÜNCELLENEN METOD: Try-Catch blokları eklendi.
         [HttpPost]
         public async Task<ActionResult<Product>> AddProduct(Product product)
         {
-            product.QrCode = Guid.NewGuid().ToString();
-            _context.Products.Add(product);
+            try
+            {
+                product.QrCode = Guid.NewGuid().ToString();
 
-            await _context.SaveChangesAsync();
+                _context.Products.Add(product);
 
-            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
         }
 
         [HttpPut("{id}")]

@@ -23,6 +23,9 @@ public class Product
     public bool IsInMaintenance { get; set; }
 
     public string QrCode { get; set; } = "";
+    public DateTime? LastMaintenanceDate { get; set; }
+
+    public DateTime? NextMaintenanceDate { get; set; }
 
     public ICollection<Maintenance> Maintenances { get; set; }
         = new List<Maintenance>();

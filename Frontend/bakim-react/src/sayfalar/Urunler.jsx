@@ -10,7 +10,7 @@ function Urunler() {
     const [urunler, setUrunler] = useState([]);
     const [duzenlemeModu, setDuzenlemeModu] = useState(false);
     const [modalAcik, setModalAcik] = useState(false);
-    const [aramaMetni, setAramaMetni] = useState(""); // Arama filtresi için state eklendi
+    const [aramaMetni, setAramaMetni] = useState("");
 
     const [yeniUrun, setYeniUrun] = useState({
         productCode: "",
@@ -35,8 +35,6 @@ function Urunler() {
     };
 
     const urunKaydet = async () => {
-        console.log("Kaydet çalıştı");
-        console.log(yeniUrun);
         try {
             if (duzenlemeModu) {
                 await urunGuncelle(yeniUrun.id, yeniUrun);
@@ -44,7 +42,6 @@ function Urunler() {
                 await urunEkle(yeniUrun);
             }
 
-            // State'i sıfırla
             setYeniUrun({
                 productCode: "",
                 productName: "",
@@ -56,10 +53,11 @@ function Urunler() {
 
             setModalAcik(false);
             setDuzenlemeModu(false);
-            urunleriYukle(); // Listeyi yenile
+            urunleriYukle(); 
         } catch (hata) {
             console.log("Status:", hata.response?.status);
             console.log("Data:", hata.response?.data);
+            console.log("Errors:", hata.response?.data?.errors);
         }
     };
 
@@ -75,7 +73,6 @@ function Urunler() {
         }
     };
 
-    // Arama filtresine göre ürünleri filtreleme mantığı
     const filtrelenmisUrunler = urunler.filter((urun) => {
         const arama = aramaMetni.toLowerCase();
         return (
@@ -122,68 +119,90 @@ function Urunler() {
             <table className="table table-bordered table-hover">
                 <thead className="table-dark">
                     <tr>
-                        <th>ID</th>
-                        <th>Ürün Kodu</th>
-                        <th>Ürün Adı</th>
+                        <th>Kod</th>
+                        <th>Ürün</th>
                         <th>Marka</th>
-                        <th>Model</th>
-                        <th>Kategori</th>
-                        <th>Konum</th>
+                        <th>Son Bakım</th>
+                        <th>Sonraki Bakım</th>
                         <th>Durum</th>
                         <th>İşlemler</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {filtrelenmisUrunler.map((urun) => (
-                        <tr key={urun.id}>
-                            <td>{urun.id}</td>
-                            <td>{urun.productCode}</td>
-                            <td>{urun.productName}</td>
-                            <td>{urun.brand}</td>
-                            <td>{urun.model}</td>
-                            <td>{urun.category}</td>
-                            <td>{urun.location}</td>
-                            <td>
-                                {urun.isInMaintenance ? (
-                                    <span className="badge bg-danger">Bakımda</span>
-                                ) : (
-                                    <span className="badge bg-success">Aktif</span>
-                                )}
-                            </td>
-                            <td>
-                                <button
-                                    className="btn btn-warning btn-sm me-2"
-                                    onClick={() => {
-                                        setDuzenlemeModu(true);
-                                        setModalAcik(true);
-                                        setYeniUrun(urun); // Düzenlenecek ürünü forma doldurur
-                                    }}
-                                >
-                                    Düzenle
-                                </button>
-                                <button
-                                    className="btn btn-danger btn-sm me-2"
-                                    onClick={() => urunuSil(urun.id)}
-                                >
-                                    Sil
-                                </button>
-                                <button
-                                    className="btn btn-primary btn-sm"
-                                    onClick={() =>
-                                        window.open(
-                                            `https://localhost:7020/api/products/qr-image/${urun.id}`,
-                                            "_blank"
-                                        )
-                                    }
-                                >
-                                    QR Göster
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
+                    {filtrelenmisUrunler.map((urun) => {
+                        const bugun = new Date();
+                        const sonrakiBakim = urun.nextMaintenanceDate
+                            ? new Date(urun.nextMaintenanceDate)
+                            : null;
+
+                        let durum = (
+                            <span className="badge bg-secondary">Belirsiz</span>
+                        );
+
+                        if (sonrakiBakim) {
+                            const fark =
+                                (sonrakiBakim - bugun) /
+                                (1000 * 60 * 60 * 24);
+
+                            if (fark < 0)
+                                durum = <span className="badge bg-danger">Gecikti</span>;
+                            else if (fark <= 30)
+                                durum = <span className="badge bg-warning text-dark">Yaklaşıyor</span>;
+                            else
+                                durum = <span className="badge bg-success">Güncel</span>;
+                        }
+
+                        return (
+                            <tr key={urun.id}>
+                                <td>{urun.productCode}</td>
+                                <td>{urun.productName}</td>
+                                <td>{urun.brand}</td>
+                                <td>
+                                    {urun.lastMaintenanceDate
+                                        ? new Date(urun.lastMaintenanceDate).toLocaleDateString("tr-TR")
+                                        : "-"}
+                                </td>
+                                <td>
+                                    {urun.nextMaintenanceDate
+                                        ? new Date(urun.nextMaintenanceDate).toLocaleDateString("tr-TR")
+                                        : "-"}
+                                </td>
+                                <td>{durum}</td>
+                                <td>
+                                    <button
+                                        className="btn btn-warning btn-sm me-2"
+                                        onClick={() => {
+                                            setDuzenlemeModu(true);
+                                            setModalAcik(true);
+                                            setYeniUrun(urun);
+                                        }}
+                                    >
+                                        Düzenle
+                                    </button>
+                                    <button
+                                        className="btn btn-danger btn-sm me-2"
+                                        onClick={() => urunuSil(urun.id)}
+                                    >
+                                        Sil
+                                    </button>
+                                    <button
+                                        className="btn btn-primary btn-sm"
+                                        onClick={() =>
+                                            window.open(
+                                                `https://localhost:7020/api/products/qr-image/${urun.id}`,
+                                                "_blank"
+                                            )
+                                        }
+                                    >
+                                        QR
+                                    </button>
+                                </td>
+                            </tr>
+                        );
+                    })}
                     {filtrelenmisUrunler.length === 0 && (
                         <tr>
-                            <td colSpan="9" className="text-center text-muted">
+                            <td colSpan="7" className="text-center text-muted">
                                 Ürün bulunamadı.
                             </td>
                         </tr>
@@ -297,4 +316,4 @@ function Urunler() {
     );
 }
 
-export default Urunler;
+export default Urunler; 

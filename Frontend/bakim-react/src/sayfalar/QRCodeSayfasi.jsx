@@ -34,10 +34,9 @@ function QRCodeSayfasi() {
 
                             <h5 className="fw-bold">{urun.productName}</h5>
 
-                            <p className="mb-1">
-                             <strong>Seri No:</strong> {urun.serialNumber}
-                               </p>
-
+                           <p className="mb-1">
+    <strong>Model:</strong> {urun.model}
+</p>
                               <p className="text-muted">
                                <strong>Konum:</strong> {urun.location}
                                </p>
@@ -45,9 +44,9 @@ function QRCodeSayfasi() {
                             <div className="d-flex justify-content-center my-3">
 
                                 <QRCode
-                                    value={`https://localhost:5173/urun/${urun.qrCode}`}
-                                    size={180}
-                                />
+    value={`http://localhost:5173/product/${urun.qrCode}`}
+    size={180}
+/>
 
                             </div>
                             <p className="text-success fw-bold">

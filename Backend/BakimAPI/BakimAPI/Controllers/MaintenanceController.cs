@@ -33,8 +33,6 @@ namespace BakimAPI.Controllers
             }
         }
 
-     
-
         // Tek bakım kaydı
         [HttpGet("{id}")]
         public async Task<ActionResult<Maintenance>> GetMaintenance(int id)
@@ -54,17 +52,40 @@ namespace BakimAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Maintenance>> AddMaintenance(Maintenance maintenance)
         {
-            var product = await _context.Products.FindAsync(maintenance.ProductId);
-
-            if (product != null)
+            try
             {
+                var product = await _context.Products.FindAsync(maintenance.ProductId);
+
+                if (product == null)
+                    return BadRequest("Ürün bulunamadı.");
+
+                var employee = await _context.Employees.FindAsync(maintenance.EmployeeId);
+
+                if (employee == null)
+                    return BadRequest("Personel bulunamadı.");
+
+                // Ürün bakım durumu ve tarih güncellemeleri
                 product.IsInMaintenance = true;
+
+                // Son bakım tarihi
+                product.LastMaintenanceDate = DateTime.Now;
+
+                // Sonraki bakım tarihi (6 ay)
+                product.NextMaintenanceDate = DateTime.Now.AddMonths(6);
+
+                // Bakım kaydının kendi tarihi
+                maintenance.MaintenanceDate = DateTime.Now;
+
+                _context.Maintenances.Add(maintenance);
+
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetMaintenance), new { id = maintenance.Id }, maintenance);
             }
-            _context.Maintenances.Add(maintenance);
-
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetMaintenance), new { id = maintenance.Id }, maintenance);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
         }
 
         // Bakım güncelle
@@ -74,16 +95,41 @@ namespace BakimAPI.Controllers
             if (id != maintenance.Id)
                 return BadRequest();
 
-            _context.Entry(maintenance).State = EntityState.Modified;
-
             var product = await _context.Products.FindAsync(maintenance.ProductId);
 
-            if (product != null && maintenance.Status == "Tamamlandı")
+            if (product != null)
             {
-                product.IsInMaintenance = false;
+                // İstediğin tarih ve durum güncellemeleri
+                product.LastMaintenanceDate = maintenance.MaintenanceDate;
+                product.NextMaintenanceDate = maintenance.MaintenanceDate.AddMonths(6);
+
+                if (maintenance.Status == "Tamamlandı")
+                {
+                    product.IsInMaintenance = false;
+                }
+                else
+                {
+                    product.IsInMaintenance = true;
+                }
             }
 
-            await _context.SaveChangesAsync();
+            _context.Entry(maintenance).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!MaintenanceExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             return NoContent();
         }
@@ -102,6 +148,11 @@ namespace BakimAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        private bool MaintenanceExists(int id)
+        {
+            return _context.Maintenances.Any(e => e.Id == id);
         }
     }
 }

@@ -68,13 +68,21 @@ function Bakimlar() {
         }
 
         try {
+            const yeniBakim = {
+                productId: Number(yeniUrun.productId),
+                employeeId: Number(yeniUrun.employeeId),
+                maintenanceDate: yeniUrun.maintenanceDate,
+                description: yeniUrun.description,
+                status: yeniUrun.status
+            };
+
             if (duzenlemeModu) {
-                await bakimGuncelle(yeniUrun.id, yeniUrun);
+                await bakimGuncelle(yeniUrun.id, yeniBakim);
             } else {
-                await bakimEkle(yeniUrun);
+                await bakimEkle(yeniBakim);
             }
 
-            // 4) Kaydettikten sonra sıfırlama (Belirttiğin gibi tam temizlik)
+            // Kaydettikten sonra sıfırlama (Belirttiğin gibi tam temizlik)
             setYeniUrun({
                 productId: "",
                 employeeId: "",
@@ -280,7 +288,7 @@ function Bakimlar() {
                                     </select>
                                 </div>
 
-                                {/* 3) Modala Eklenen Yeni Input Alanları */}
+                                {/* Modala Eklenen Yeni Input Alanları */}
                                 <div className="mb-2">
                                     <label className="form-label">Marka</label>
                                     <input

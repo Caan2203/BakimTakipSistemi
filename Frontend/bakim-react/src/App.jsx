@@ -8,49 +8,53 @@ import Personeller from "./sayfalar/Personeller";
 import Bakimlar from "./sayfalar/Bakimlar";
 import QRCodeSayfasi from "./sayfalar/QRCodeSayfasi";
 import UrunDetay from "./sayfalar/UrunDetay";
+import ProductDetail from "./sayfalar/ProductDetail";
 
 function App() {
     return (
         <AnaDuzen>
+           <Routes>
 
-            <Routes>
-                <Route
-    path="/urun/:qrCode"
-    element={<UrunDetay />}
+    <Route
+        path="/"
+        element={<Navigate to="/gosterge-paneli" />}
+    />
+
+    <Route
+        path="/gosterge-paneli"
+        element={<GostergePaneli />}
+    />
+
+    <Route
+        path="/urunler"
+        element={<Urunler />}
+    />
+
+    <Route
+        path="/personeller"
+        element={<Personeller />}
+    />
+
+    <Route
+        path="/bakimlar"
+        element={<Bakimlar />}
+    />
+
+    <Route
+        path="/qr-kod"
+        element={<QRCodeSayfasi />}
+    />
+
+    <Route
+        path="/product/:qrCode"
+        element={<ProductDetail />}
+    />
+    <Route
+    path="/qr-kod/:qrCode"
+    element={<ProductDetail />}
 />
 
-                <Route
-                    path="/"
-                    element={<Navigate to="/gosterge-paneli" />}
-                />
-
-                <Route
-                    path="/gosterge-paneli"
-                    element={<GostergePaneli />}
-                />
-
-                <Route
-                    path="/urunler"
-                    element={<Urunler />}
-                />
-
-                <Route
-                    path="/personeller"
-                    element={<Personeller />}
-                />
-
-                <Route
-                    path="/bakimlar"
-                    element={<Bakimlar />}
-                />
-
-                <Route
-                    path="/qr-kod"
-                    element={<QRCodeSayfasi />}
-                />
-
-            </Routes>
-
+</Routes>
         </AnaDuzen>
     );
 }
