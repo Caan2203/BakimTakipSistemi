@@ -72,17 +72,28 @@ function Bakimlar() {
 
         try {
             // Sorun 1 Çözümü: API'deki 400 hatasını engellemek için id eklendi
-          const yeniBakim = {
-    id: yeniUrun.id,
-    productId: Number(yeniUrun.productId),
-    employeeId: Number(yeniUrun.employeeId),
-    maintenanceDate: yeniUrun.maintenanceDate,
-    description: yeniUrun.description,
-    status: yeniUrun.status
-    
-};
-console.log("Gönderilen bakım =", yeniBakim);
-console.log(yeniBakim);
+            let yeniBakim;
+
+            if (duzenlemeModu) {
+                yeniBakim = {
+                    id: Number(yeniUrun.id),
+                    productId: Number(yeniUrun.productId),
+                    employeeId: Number(yeniUrun.employeeId),
+                    maintenanceDate: yeniUrun.maintenanceDate,
+                    description: yeniUrun.description,
+                    status: yeniUrun.status
+                };
+            } else {
+                yeniBakim = {
+                    productId: Number(yeniUrun.productId),
+                    employeeId: Number(yeniUrun.employeeId),
+                    maintenanceDate: yeniUrun.maintenanceDate,
+                    description: yeniUrun.description,
+                    status: yeniUrun.status
+                };
+            }
+            console.log("Gönderilen bakım =", yeniBakim);
+            console.log(yeniBakim);
             if (duzenlemeModu) {
                 await bakimGuncelle(yeniUrun.id, yeniBakim);
             } else {
@@ -95,14 +106,11 @@ console.log(yeniBakim);
             setModalAcik(false);
             verileriYukle();
         } catch (hata) {
-    console.log(hata);
-
-    console.log(hata.response);
-
-    console.log(hata.response?.data);
-
-    alert(JSON.stringify(hata.response?.data));
-}
+            console.log(hata);
+            console.log(hata.response);
+            console.log(hata.response?.data);
+            alert(JSON.stringify(hata.response?.data));
+        }
     };
 
     const bakimiSil = async (id) => {
@@ -136,13 +144,13 @@ console.log(yeniBakim);
             <table className="table table-bordered table-hover">
                 <thead className="table-dark">
                     <tr>
-                     <th>Sıra No</th>
-<th>Ürün Kodu</th>
-<th>Ürün Adı</th>
-<th>Personel</th>
-<th>Bakım Tarihi</th>
-<th>Durum</th>
-<th>İşlemler</th>
+                        <th>Sıra No</th>
+                        <th>Ürün Kodu</th>
+                        <th>Ürün Adı</th>
+                        <th>Personel</th>
+                        <th>Bakım Tarihi</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -155,42 +163,48 @@ console.log(yeniBakim);
                     ) : (
                         bakimlar.map((bakim, index) => {
                             const urun = urunler.find(u => u.id === bakim.productId) || {};
-                            const personel =
-    personeller.find(p => p.id === bakim.employeeId) || {};
+                            const personel = personeller.find(p => p.id === bakim.employeeId) || {};
                             return (
                                 <tr key={bakim.id}>
                                     <td>{index + 1}</td>
                                     <td>{urun.productCode || "-"}</td>
                                     <td>{urun.productName || "-"}</td>
                                     <td>
-    {personel.firstName
-        ? `${personel.firstName} ${personel.lastName}`
-        : "-"}
-</td>
-
-<td>
-    {bakim.maintenanceDate
-        ? new Date(bakim.maintenanceDate).toLocaleDateString("tr-TR")
-        : "-"}
-</td>
-                                    <td>
-                                        <span
-                                            className={
-                                                bakim.status === "Tamamlandı"
-                                                    ? "badge bg-success"
-                                                    : bakim.status === "Devam Ediyor"
-                                                    ? "badge bg-warning text-dark"
-                                                    : "badge bg-danger"
-                                            }
-                                        >
-                                            {bakim.status || "Bekliyor"}
-                                        </span>
+                                        {personel.firstName
+                                            ? `${personel.firstName} ${personel.lastName}`
+                                            : "-"}
                                     </td>
+
+                                    <td>
+                                        {bakim.maintenanceDate
+                                            ? new Date(bakim.maintenanceDate).toLocaleDateString("tr-TR")
+                                            : "-"}
+                                    </td>
+                                    
+                                    {/* DEĞİŞTİRİLEN VE HATASIZ HALE GETİRİLEN DURUM ALANI */}
+                                    <td>
+                                        {bakim.status === "Tamamlandı" && (
+                                            <span className="badge bg-success">
+                                                Tamamlandı
+                                            </span>
+                                        )}
+
+                                        {bakim.status === "Devam Ediyor" && (
+                                            <span className="badge bg-warning text-dark">
+                                                Devam Ediyor
+                                            </span>
+                                        )}
+
+                                        {(bakim.status === "Bekliyor" || !bakim.status) && (
+                                            <span className="badge bg-danger">
+                                                Bekliyor
+                                            </span>
+                                        )}
+                                    </td>
+                                    
                                     <td>
                                         <button
-                                        
                                             className="btn btn-warning btn-sm me-2"
-                                            
                                             onClick={() => {
                                                 console.log("Bakım =", bakim);
                                                 setDuzenlemeModu(true);
@@ -271,9 +285,9 @@ console.log(yeniBakim);
                                     >
                                         <option value="">Ürün Seçin</option>
                                         {urunler.map((u) => (
-                                           <option key={u.id} value={u.id}>
-    {u.productCode} - {u.productName}
-</option>
+                                            <option key={u.id} value={u.id}>
+                                                {u.productCode} - {u.productName}
+                                            </option>
                                         ))}
                                     </select>
                                 </div>

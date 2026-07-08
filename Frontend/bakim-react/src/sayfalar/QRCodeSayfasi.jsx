@@ -30,37 +30,39 @@ function QRCodeSayfasi() {
 
                     <div className="col-md-4 mb-4" key={urun.id}>
 
-                        <div className="card shadow text-center p-3">
+                        <div className="card shadow text-center p-3 h-100">
 
                             <h5 className="fw-bold">{urun.productName}</h5>
 
-                           <p className="mb-1">
-    <strong>Model:</strong> {urun.model}
-</p>
-                              <p className="text-muted">
-                               <strong>Konum:</strong> {urun.location}
-                               </p>
+                            <p className="mb-1">
+                                <strong>Model:</strong> {urun.model}
+                            </p>
+                            
+                            <p className="text-muted">
+                                <strong>Konum:</strong> {urun.location}
+                            </p>
 
                             <div className="d-flex justify-content-center my-3">
 
                                 <QRCode
-    value={`http://localhost:5173/product/${urun.qrCode}`}
-    size={180}
-/>
+                                    value={`http://localhost:5173/product/${urun.qrCode}`}
+                                    size={180}
+                                />
 
                             </div>
-                            <p className="text-success fw-bold">
-  
-                              QR Hazır
-                               </p>
+                            
+                            <p className="text-success fw-bold mb-auto">
+                                QR Hazır
+                            </p>
+
+                            <button
+                                className="btn btn-primary mt-3 w-100"
+                                onClick={() => window.print()}
+                            >
+                                QR Yazdır
+                            </button>
 
                         </div>
-                        <button
-    className="btn btn-primary mt-3"
-    onClick={() => window.print()}
->
-    QR Yazdır
-</button>
 
                     </div>
 

@@ -82,6 +82,7 @@ function Urunler() {
             urun.model?.toLowerCase().includes(arama)
         );
     });
+    
 
     return (
         <div className="container mt-4">

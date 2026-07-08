@@ -149,6 +149,32 @@ namespace BakimAPI.Controllers
 
             return NoContent();
         }
+        [HttpGet("upcoming")]
+        public async Task<IActionResult> GetUpcomingMaintenances()
+        {
+            var today = DateTime.Today;
+            var nextWeek = today.AddDays(30);
+
+            var products = await _context.Products
+                .Where(p => p.NextMaintenanceDate >= today &&
+                            p.NextMaintenanceDate <= nextWeek)
+                .OrderBy(p => p.NextMaintenanceDate)
+                .ToListAsync();
+
+            return Ok(products);
+        }
+        [HttpGet("overdue")]
+        public async Task<IActionResult> GetOverdueProducts()
+        {
+            var today = DateTime.Today;
+
+            var products = await _context.Products
+                .Where(p => p.NextMaintenanceDate < today)
+                .OrderBy(p => p.NextMaintenanceDate)
+                .ToListAsync();
+
+            return Ok(products);
+        }
 
         private bool MaintenanceExists(int id)
         {

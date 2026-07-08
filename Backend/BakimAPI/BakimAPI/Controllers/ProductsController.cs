@@ -153,6 +153,22 @@ namespace BakimAPI.Controllers
 
             return NoContent();
         }
+        [HttpGet("upcoming")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetUpcomingProducts()
+        {
+            var today = DateTime.Today;
+            var next30Days = today.AddDays(30);
+
+            var products = await _context.Products
+                .Where(p =>
+                    p.NextMaintenanceDate != null &&
+                    p.NextMaintenanceDate >= today &&
+                    p.NextMaintenanceDate <= next30Days)
+                .OrderBy(p => p.NextMaintenanceDate)
+                .ToListAsync();
+
+            return Ok(products);
+        }
 
         private bool ProductExists(int id)
         {

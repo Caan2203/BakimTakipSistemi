@@ -24,7 +24,14 @@ function ProductDetail() {
 
     if (!urun)
         return <h3 className="text-center mt-5">Yükleniyor...</h3>;
+const bugun = new Date();
 
+const sonrakiBakim = urun?.nextMaintenanceDate
+    ? new Date(urun.nextMaintenanceDate)
+    : null;
+
+const bakimGecikti =
+    sonrakiBakim && sonrakiBakim < bugun;
     return (
         <div className="container mt-4">
             <div className="card shadow">
@@ -40,6 +47,19 @@ function ProductDetail() {
                     <p><b>Model:</b> {urun.model}</p>
                     <p><b>Kategori:</b> {urun.category}</p>
                     <p><b>Konum:</b> {urun.location}</p>
+                    <p>
+    <b>Son Bakım Tarihi:</b>{" "}
+    {urun.lastMaintenanceDate
+        ? new Date(urun.lastMaintenanceDate).toLocaleDateString("tr-TR")
+        : "-"}
+</p>
+
+<p>
+    <b>Sonraki Bakım:</b>{" "}
+    {urun.nextMaintenanceDate
+        ? new Date(urun.nextMaintenanceDate).toLocaleDateString("tr-TR")
+        : "-"}
+</p>
 
                     <p>
                         <b>Durum:</b>{" "}
@@ -55,7 +75,15 @@ function ProductDetail() {
                     </p>
 
                     <hr />
-
+{bakimGecikti ? (
+    <div className="alert alert-danger">
+        ⚠️ Bu ürünün bakım zamanı gelmiş.
+    </div>
+) : (
+    <div className="alert alert-success">
+        ✅ Bakımı güncel.
+    </div>
+)}
                     <h4>Bakım Geçmişi</h4>
 
                     <table className="table table-bordered">

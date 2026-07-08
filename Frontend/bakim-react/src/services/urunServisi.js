@@ -17,3 +17,7 @@ export const urunGuncelle = async (id, urun) => {
 export const urunSil = async (id) => {
     await api.delete(`/Products/${id}`);
 };
+export const yaklasanBakimlariGetir = async () => {
+    const response = await api.get("/Products/upcoming");
+    return response.data;
+};
