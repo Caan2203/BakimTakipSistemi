@@ -15,8 +15,6 @@ namespace BakimAPI.Controllers
         {
             _context = context;
         }
-
-        // Tüm bakım kayıtları
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Maintenance>>> GetMaintenances()
         {
@@ -33,7 +31,6 @@ namespace BakimAPI.Controllers
             }
         }
 
-        // Tek bakım kaydı
         [HttpGet("{id}")]
         public async Task<ActionResult<Maintenance>> GetMaintenance(int id)
         {
@@ -48,7 +45,6 @@ namespace BakimAPI.Controllers
             return maintenance;
         }
 
-        // Yeni bakım ekle
         [HttpPost]
         public async Task<ActionResult<Maintenance>> AddMaintenance(Maintenance maintenance)
         {
@@ -64,16 +60,12 @@ namespace BakimAPI.Controllers
                 if (employee == null)
                     return BadRequest("Personel bulunamadı.");
 
-                // Ürün bakım durumu ve tarih güncellemeleri
                 product.IsInMaintenance = true;
 
-                // Son bakım tarihi
                 product.LastMaintenanceDate = DateTime.Now;
 
-                // Sonraki bakım tarihi (6 ay)
                 product.NextMaintenanceDate = DateTime.Now.AddMonths(6);
 
-                // Bakım kaydının kendi tarihi
                 maintenance.MaintenanceDate = DateTime.Now;
 
                 _context.Maintenances.Add(maintenance);
@@ -87,8 +79,6 @@ namespace BakimAPI.Controllers
                 return BadRequest(ex.ToString());
             }
         }
-
-        // Bakım güncelle
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMaintenance(int id, Maintenance maintenance)
         {
@@ -99,7 +89,6 @@ namespace BakimAPI.Controllers
 
             if (product != null)
             {
-                // İstediğin tarih ve durum güncellemeleri
                 product.LastMaintenanceDate = maintenance.MaintenanceDate;
                 product.NextMaintenanceDate = maintenance.MaintenanceDate.AddMonths(6);
 
@@ -133,8 +122,6 @@ namespace BakimAPI.Controllers
 
             return NoContent();
         }
-
-        // Bakım sil
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMaintenance(int id)
         {

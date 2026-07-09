@@ -1,65 +1,73 @@
 import { NavLink } from "react-router-dom";
+import "./Menu.css";
 
 function Menu() {
+
     const menuClass = ({ isActive }) =>
         isActive
-            ? "nav-link bg-primary text-white rounded"
-            : "nav-link text-white";
+            ? "menu-link active"
+            : "menu-link";
 
     return (
-        <div className="bg-dark text-white vh-100 p-3" style={{ width: "250px" }}>
-            <h3 className="text-center mb-4">Bakım Takip</h3>
 
-            <ul className="nav flex-column">
+        <aside className="sidebar">
 
-                <li className="nav-item mb-2">
-                    <NavLink
-                        to="/gosterge-paneli"
-                        className={menuClass}
-                    >
-                        🏠 Gösterge Paneli
-                    </NavLink>
-                </li>
+            <div className="logo">
 
-                <li className="nav-item mb-2">
-                    <NavLink
-                        to="/urunler"
-                        className={menuClass}
-                    >
-                        📦 Ürünler
-                    </NavLink>
-                </li>
+                <h3>🛠 Bakım Takip</h3>
 
-                <li className="nav-item mb-2">
-                    <NavLink
-                        to="/personeller"
-                        className={menuClass}
-                    >
-                        👷 Personeller
-                    </NavLink>
-                </li>
+                <p>Yönetim Paneli</p>
 
-                <li className="nav-item mb-2">
-                    <NavLink
-                        to="/bakimlar"
-                        className={menuClass}
-                    >
-                        🔧 Bakımlar
-                    </NavLink>
-                </li>
+            </div>
 
-                <li className="nav-item">
-                    <NavLink
-                        to="/qr-kod"
-                        className={menuClass}
-                    >
-                        📷 QR Kod
-                    </NavLink>
-                </li>
+            <nav>
 
-            </ul>
-        </div>
+                <NavLink
+                    to="/gosterge-paneli"
+                    className={menuClass}
+                >
+                    
+                    <span>Gösterge Paneli</span>
+                </NavLink>
+
+                <NavLink
+                    to="/urunler"
+                    className={menuClass}
+                >
+                    
+                    <span>Ürünler</span>
+                </NavLink>
+
+                <NavLink
+                    to="/personeller"
+                    className={menuClass}
+                >
+                    
+                    <span>Personeller</span>
+                </NavLink>
+
+                <NavLink
+                    to="/bakimlar"
+                    className={menuClass}
+                >
+                    
+                    <span>Bakımlar</span>
+                </NavLink>
+
+                <NavLink
+                    to="/qr-kod"
+                    className={menuClass}
+                >
+                    
+                    <span>QR Kod</span>
+                </NavLink>
+
+            </nav>
+
+        </aside>
+
     );
+
 }
 
 export default Menu;

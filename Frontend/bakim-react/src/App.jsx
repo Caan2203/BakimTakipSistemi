@@ -9,6 +9,8 @@ import Bakimlar from "./sayfalar/Bakimlar";
 import QRCodeSayfasi from "./sayfalar/QRCodeSayfasi";
 import UrunDetay from "./sayfalar/UrunDetay";
 import ProductDetail from "./sayfalar/ProductDetail";
+import BakimEkle from "./sayfalar/BakimEkle";
+import BakimDuzenle from "./sayfalar/BakimDuzenle";
 
 function App() {
     return (
@@ -52,6 +54,14 @@ function App() {
     <Route
     path="/qr-kod/:qrCode"
     element={<ProductDetail />}
+/>
+<Route
+    path="/bakim-ekle/:qrCode"
+    element={<BakimEkle />}
+/>
+<Route
+    path="/bakim-duzenle/:id"
+    element={<BakimDuzenle />}
 />
 
 </Routes>

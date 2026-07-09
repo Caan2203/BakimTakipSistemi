@@ -4,8 +4,6 @@ namespace BakimAPI.Models
 {
     public class DashboardDto
     {
-        // İstatistik Kartları
-
         public int TotalProducts { get; set; }
 
         public int ProductsInMaintenance { get; set; }

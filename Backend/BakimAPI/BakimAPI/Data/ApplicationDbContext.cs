@@ -16,5 +16,7 @@ namespace BakimAPI.Data
 
         public DbSet<Maintenance> Maintenances { get; set; }
 
+        public DbSet<Kullanici> Kullanicilar { get; set; }
+
     }
 }

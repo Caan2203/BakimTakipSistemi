@@ -6,9 +6,17 @@ function AnaDuzen({ children }) {
 
             <Menu />
 
-            <div className="container-fluid p-4">
+            <main
+                className="flex-grow-1"
+                style={{
+                    marginLeft: "260px",
+                    minHeight: "100vh",
+                    background: "#f5f7fb",
+                    padding: "30px"
+                }}
+            >
                 {children}
-            </div>
+            </main>
 
         </div>
     );

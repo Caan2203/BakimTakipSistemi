@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../api";
 
 function ProductDetail() {
     const { qrCode } = useParams();
+    const navigate = useNavigate();
     const [urun, setUrun] = useState(null);
 
     useEffect(() => {
@@ -24,14 +25,16 @@ function ProductDetail() {
 
     if (!urun)
         return <h3 className="text-center mt-5">Yükleniyor...</h3>;
-const bugun = new Date();
 
-const sonrakiBakim = urun?.nextMaintenanceDate
-    ? new Date(urun.nextMaintenanceDate)
-    : null;
+    const bugun = new Date();
 
-const bakimGecikti =
-    sonrakiBakim && sonrakiBakim < bugun;
+    const sonrakiBakim = urun?.nextMaintenanceDate
+        ? new Date(urun.nextMaintenanceDate)
+        : null;
+
+    const bakimGecikti =
+        sonrakiBakim && sonrakiBakim < bugun;
+
     return (
         <div className="container mt-4">
             <div className="card shadow">
@@ -48,18 +51,18 @@ const bakimGecikti =
                     <p><b>Kategori:</b> {urun.category}</p>
                     <p><b>Konum:</b> {urun.location}</p>
                     <p>
-    <b>Son Bakım Tarihi:</b>{" "}
-    {urun.lastMaintenanceDate
-        ? new Date(urun.lastMaintenanceDate).toLocaleDateString("tr-TR")
-        : "-"}
-</p>
+                        <b>Son Bakım Tarihi:</b>{" "}
+                        {urun.lastMaintenanceDate
+                            ? new Date(urun.lastMaintenanceDate).toLocaleDateString("tr-TR")
+                            : "-"}
+                    </p>
 
-<p>
-    <b>Sonraki Bakım:</b>{" "}
-    {urun.nextMaintenanceDate
-        ? new Date(urun.nextMaintenanceDate).toLocaleDateString("tr-TR")
-        : "-"}
-</p>
+                    <p>
+                        <b>Sonraki Bakım:</b>{" "}
+                        {urun.nextMaintenanceDate
+                            ? new Date(urun.nextMaintenanceDate).toLocaleDateString("tr-TR")
+                            : "-"}
+                    </p>
 
                     <p>
                         <b>Durum:</b>{" "}
@@ -75,15 +78,17 @@ const bakimGecikti =
                     </p>
 
                     <hr />
-{bakimGecikti ? (
-    <div className="alert alert-danger">
-        ⚠️ Bu ürünün bakım zamanı gelmiş.
-    </div>
-) : (
-    <div className="alert alert-success">
-        ✅ Bakımı güncel.
-    </div>
-)}
+
+                    {bakimGecikti ? (
+                        <div className="alert alert-danger">
+                            ⚠️ Bu ürünün bakım zamanı gelmiş.
+                        </div>
+                    ) : (
+                        <div className="alert alert-success">
+                            ✅ Bakımı güncel.
+                        </div>
+                    )}
+
                     <h4>Bakım Geçmişi</h4>
 
                     <table className="table table-bordered">
@@ -128,6 +133,15 @@ const bakimGecikti =
                             )}
                         </tbody>
                     </table>
+
+                    <div className="d-grid mt-4">
+                        <button
+                            className="btn btn-warning btn-lg"
+                            onClick={() => navigate(`/bakim-ekle/${urun.qrCode}`)}
+                        >
+                            🔧 Bu Ürüne Bakım Yap
+                        </button>
+                    </div>
 
                 </div>
 

@@ -6,7 +6,6 @@ function Dashboard() {
     const [bakimdakiUrun, setBakimdakiUrun] = useState(0);
     const [personelSayisi, setPersonelSayisi] = useState(0);
     const [bakimSayisi, setBakimSayisi] = useState(0);
-    // Yeni eklenen state
     const [yaklasanBakim, setYaklasanBakim] = useState(0);
 
     useEffect(() => {
@@ -29,7 +28,6 @@ function Dashboard() {
 
             setBakimSayisi(bakimlar.data.length);
 
-            // Yaklaşan bakım hesaplama mantığı
             const bugun = new Date();
             const yaklasan = urunler.data.filter(u => {
                 if (!u.nextMaintenanceDate)
