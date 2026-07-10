@@ -14,7 +14,7 @@ function ProductDetail() {
     const urunuGetir = async () => {
         try {
             const response = await api.get(`/Products/qr/${qrCode}`);
-            console.log(response.data); // Kontrol için
+            console.log(response.data);
 
             setUrun(response.data);
         }

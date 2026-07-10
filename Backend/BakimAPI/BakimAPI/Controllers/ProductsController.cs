@@ -53,7 +53,6 @@ namespace BakimAPI.Controllers
             return product;
         }
 
-        // GÜNCELLENEN METOD: Try-Catch blokları eklendi.
         [HttpPost]
         public async Task<ActionResult<Product>> AddProduct(Product product)
         {
@@ -80,15 +79,12 @@ namespace BakimAPI.Controllers
             {
                 return BadRequest("ID uyuşmazlığı.");
             }
-
-            // 1. Veri tabanındaki mevcut ürünü çekiyoruz
             var existingProduct = await _context.Products.FindAsync(id);
             if (existingProduct == null)
             {
                 return NotFound("Güncellenmek istenen ürün bulunamadı.");
             }
 
-            // 2. QrCode hariç tüm alanları güvenli bir şekilde güncelliyoruz
             existingProduct.ProductCode = product.ProductCode;
             existingProduct.ProductName = product.ProductName;
             existingProduct.Brand = product.Brand;
@@ -99,7 +95,6 @@ namespace BakimAPI.Controllers
 
             try
             {
-                // 3. Değişiklikleri kaydediyoruz
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
