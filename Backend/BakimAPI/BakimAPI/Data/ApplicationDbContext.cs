@@ -18,5 +18,6 @@ namespace BakimAPI.Data
 
         public DbSet<Kullanici> Kullanicilar { get; set; }
 
+        public DbSet<Zimmet> Zimmetler { get; set; }
     }
 }

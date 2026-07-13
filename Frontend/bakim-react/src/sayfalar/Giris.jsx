@@ -59,7 +59,7 @@ function Giris() {
     <i
         className="bi bi-tools"
         style={{
-            fontSize: 55,
+            fontSize: 100,
             color: "#0d6efd"
         }}
     ></i>

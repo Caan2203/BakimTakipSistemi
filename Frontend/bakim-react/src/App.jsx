@@ -12,7 +12,7 @@ import QRCodeSayfasi from "./sayfalar/QRCodeSayfasi";
 import ProductDetail from "./sayfalar/ProductDetail";
 import BakimEkle from "./sayfalar/BakimEkle";
 import BakimDuzenle from "./sayfalar/BakimDuzenle";
-
+import Zimmetler from "./sayfalar/Zimmetler";
 function App() {
     return (
         <Routes>
@@ -79,8 +79,9 @@ function App() {
                     path="/bakim-duzenle/:id"
                     element={<BakimDuzenle />}
                 />
-
+                
             </Route>
+            <Route path="/zimmetler" element={<Zimmetler />} />
 
         </Routes>
     );

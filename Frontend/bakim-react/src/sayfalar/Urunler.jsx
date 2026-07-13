@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     urunleriGetir,
     urunEkle,
@@ -11,14 +12,15 @@ function Urunler() {
     const [duzenlemeModu, setDuzenlemeModu] = useState(false);
     const [modalAcik, setModalAcik] = useState(false);
     const [aramaMetni, setAramaMetni] = useState("");
+    const navigate = useNavigate();
 
     const [yeniUrun, setYeniUrun] = useState({
         productCode: "",
         productName: "",
         brand: "",
         model: "",
-        category: "",
-        location: ""
+        location: "",
+        maintenancePeriodDay: 30
     });
 
     useEffect(() => {
@@ -47,17 +49,15 @@ function Urunler() {
                 productName: "",
                 brand: "",
                 model: "",
-                category: "",
-                location: ""
+                location: "",
+                maintenancePeriodDay: 30
             });
 
             setModalAcik(false);
             setDuzenlemeModu(false);
-            urunleriYukle(); 
+            await urunleriYukle(); 
         } catch (hata) {
-            console.log("Status:", hata.response?.status);
-            console.log("Data:", hata.response?.data);
-            console.log("Errors:", hata.response?.data?.errors);
+            console.error("Hata detayı:", hata.response?.data);
         }
     };
 
@@ -82,14 +82,29 @@ function Urunler() {
             urun.model?.toLowerCase().includes(arama)
         );
     });
-    
+
+    // Tablo hücreleri için padding kuralı
+    const hucreStili = { padding: "18px" };
 
     return (
-        <div className="container mt-4">
+        <div
+            className="container-fluid py-4"
+            style={{
+                maxWidth: "1700px",
+                margin: "0 auto"
+            }}
+        >
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Ürün Yönetimi</h2>
+                <div>
+                    <h2 className="fw-bold mb-2">
+                        📦 Ürünler
+                    </h2>
+                    <p className="text-muted mb-0">
+                        Tüm ürünleri görüntüleyebilir, düzenleyebilir ve bakım işlemlerini yönetebilirsiniz.
+                    </p>
+                </div>
                 <button
-                    className="btn btn-success"
+                    className="btn btn-primary"
                     onClick={() => {
                         setDuzenlemeModu(false);
                         setYeniUrun({
@@ -97,119 +112,171 @@ function Urunler() {
                             productName: "",
                             brand: "",
                             model: "",
-                            category: "",
-                            location: ""
+                            location: "",
+                            maintenancePeriodDay: 30
                         });
                         setModalAcik(true);
                     }}
                 >
-                    + Yeni Ürün
+                    ➕ Yeni Ürün Kaydı
                 </button>
             </div>
 
-            <div className="mb-3">
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Ürün adı, kodu veya markaya göre ara..."
-                    value={aramaMetni}
-                    onChange={(e) => setAramaMetni(e.target.value)}
-                />
+            <div className="card shadow-sm border-0 mb-4">
+                <div className="card-body">
+                    <div className="row align-items-center">
+                        <div className="col-md-8">
+                            <input
+                                type="text"
+                                className="form-control form-control-lg"
+                                placeholder="Ürün adı, kodu, marka veya modele göre ara..."
+                                value={aramaMetni}
+                                onChange={(e) => setAramaMetni(e.target.value)}
+                            />
+                        </div>
+                        <div className="col-md-4 text-end">
+                            <span className="badge bg-primary p-3 fs-6">
+                                Toplam Ürün : {urunler.length}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <table className="table table-bordered table-hover">
-                <thead className="table-dark">
-                    <tr>
-                        <th>Kod</th>
-                        <th>Ürün</th>
-                        <th>Marka</th>
-                        <th>Son Bakım</th>
-                        <th>Sonraki Bakım</th>
-                        <th>Durum</th>
-                        <th>İşlemler</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filtrelenmisUrunler.map((urun) => {
-                        const bugun = new Date();
-                        const sonrakiBakim = urun.nextMaintenanceDate
-                            ? new Date(urun.nextMaintenanceDate)
-                            : null;
+            <div className="card shadow-sm border-0">
+                <div className="card-body p-0">
+                    <div className="table-responsive">
+                        <table className="table table-hover align-middle mb-0">
+                            <thead className="table-dark">
+                                <tr>
+                                    <th style={hucreStili}>Zimmet</th>
+                                    <th style={hucreStili}>Kod</th>
+                                    <th style={hucreStili}>Ürün</th>
+                                    <th style={hucreStili}>Marka</th>
+                                    <th style={hucreStili}>Son Bakım</th>
+                                    <th style={hucreStili}>Sonraki Bakım</th>
+                                    <th style={hucreStili}>Durum</th>
+                                    <th style={hucreStili}>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody className="align-middle">
+                                {filtrelenmisUrunler.map((urun) => {
+                                    const bugun = new Date();
+                                    const sonrakiBakim = urun.nextMaintenanceDate
+                                        ? new Date(urun.nextMaintenanceDate)
+                                        : null;
 
-                        let durum = (
-                            <span className="badge bg-secondary">Belirsiz</span>
-                        );
+                                    let durum = (
+                                        <span className="badge bg-secondary">Belirsiz</span>
+                                    );
 
-                        if (sonrakiBakim) {
-                            const fark =
-                                (sonrakiBakim - bugun) /
-                                (1000 * 60 * 60 * 24);
+                                    if (sonrakiBakim) {
+                                        const fark = Math.ceil((sonrakiBakim - bugun) / (1000 * 60 * 60 * 24));
 
-                            if (fark < 0)
-                                durum = <span className="badge bg-danger">Gecikti</span>;
-                            else if (fark <= 30)
-                                durum = <span className="badge bg-warning text-dark">Yaklaşıyor</span>;
-                            else
-                                durum = <span className="badge bg-success">Güncel</span>;
-                        }
+                                        if (fark < 0)
+                                            durum = <span className="badge bg-danger">Gecikti</span>;
+                                        else if (fark <= 30)
+                                            durum = <span className="badge bg-warning text-dark">Yaklaşıyor</span>;
+                                        else
+                                            durum = <span className="badge bg-success">Güncel</span>;
+                                    }
 
-                        return (
-                            <tr key={urun.id}>
-                                <td>{urun.productCode}</td>
-                                <td>{urun.productName}</td>
-                                <td>{urun.brand}</td>
-                                <td>
-                                    {urun.lastMaintenanceDate
-                                        ? new Date(urun.lastMaintenanceDate).toLocaleDateString("tr-TR")
-                                        : "-"}
-                                </td>
-                                <td>
-                                    {urun.nextMaintenanceDate
-                                        ? new Date(urun.nextMaintenanceDate).toLocaleDateString("tr-TR")
-                                        : "-"}
-                                </td>
-                                <td>{durum}</td>
-                                <td>
-                                    <button
-                                        className="btn btn-warning btn-sm me-2"
-                                        onClick={() => {
-                                            setDuzenlemeModu(true);
-                                            setModalAcik(true);
-                                            setYeniUrun(urun);
-                                        }}
-                                    >
-                                        Düzenle
-                                    </button>
-                                    <button
-                                        className="btn btn-danger btn-sm me-2"
-                                        onClick={() => urunuSil(urun.id)}
-                                    >
-                                        Sil
-                                    </button>
-                                    <button
-                                        className="btn btn-primary btn-sm"
-                                        onClick={() =>
-                                            window.open(
-                                                `https://localhost:7020/api/products/qr-image/${urun.id}`,
-                                                "_blank"
-                                            )
-                                        }
-                                    >
-                                        QR
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                    {filtrelenmisUrunler.length === 0 && (
-                        <tr>
-                            <td colSpan="7" className="text-center text-muted">
-                                Ürün bulunamadı.
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                                    return (
+                                        <tr key={urun.id}>
+                                            <td style={hucreStili}>
+                                                {urun.isAssigned ? (
+                                                    <span className="badge bg-danger">Zimmetli</span>
+                                                ) : (
+                                                    <span className="badge bg-success">Boşta</span>
+                                                )}
+                                            </td>
+                                            <td style={hucreStili}>{urun.productCode}</td>
+                                            <td style={hucreStili}>{urun.productName}</td>
+                                            <td style={hucreStili}>{urun.brand}</td>
+                                            <td style={hucreStili}>
+                                                {urun.lastMaintenanceDate
+                                                    ? new Date(urun.lastMaintenanceDate).toLocaleDateString("tr-TR")
+                                                    : "-"}
+                                            </td>
+                                            <td style={hucreStili}>
+                                                {urun.nextMaintenanceDate
+                                                    ? new Date(urun.nextMaintenanceDate).toLocaleDateString("tr-TR")
+                                                    : "-"}
+                                            </td>
+                                            <td style={hucreStili}>{durum}</td>
+                                            <td style={{ width: "290px", ...hucreStili }}>
+                                                <div className="d-flex flex-wrap gap-2">
+                                                    <button 
+                                                        className="btn btn-warning btn-sm"
+                                                        onClick={() => {
+                                                            setDuzenlemeModu(true);
+                                                            setModalAcik(true);
+                                                            setYeniUrun(urun);
+                                                        }}
+                                                    >
+                                                        Düzenle
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-danger btn-sm"
+                                                        onClick={() => urunuSil(urun.id)}
+                                                    >
+                                                        Sil
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-primary btn-sm"
+                                                        onClick={() =>
+                                                            window.open(
+                                                                `https://localhost:7020/api/products/qr-image/${urun.id}`,
+                                                                "_blank"
+                                                            )
+                                                        }
+                                                    >
+                                                        Detay
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-info btn-sm"
+                                                        disabled={urun.isAssigned}
+                                                        onClick={() =>
+                                                            navigate("/zimmetler", {
+                                                                state: {
+                                                                    productId: urun.id,
+                                                                    productName: urun.productName
+                                                                }
+                                                            })
+                                                        }
+                                                    >
+                                                        Zimmetle
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-success btn-sm"
+                                                        onClick={() =>
+                                                            navigate("/bakimlar", {
+                                                                state: {
+                                                                    productId: urun.id,
+                                                                    productName: urun.productName
+                                                                }
+                                                            })
+                                                        }
+                                                    >
+                                                        Bakım Yap
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                {filtrelenmisUrunler.length === 0 && (
+                                    <tr>
+                                        <td colSpan="8" className="text-center text-muted" style={hucreStili}>
+                                            Ürün bulunamadı.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             {modalAcik && (
                 <div
@@ -220,7 +287,8 @@ function Urunler() {
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">
-                                    {duzenlemeModu ? "Ürün Düzenle" : "Yeni Ürün Ekle"}
+                                    <i className="bi bi-box-seam me-2"></i>
+                                    {duzenlemeModu ? "Ürün Düzenle" : "Yeni Ürün Kaydı"}
                                 </h5>
                                 <button
                                     className="btn-close"
@@ -228,72 +296,110 @@ function Urunler() {
                                 ></button>
                             </div>
                             <div className="modal-body">
-                                <input
-                                    className="form-control mb-2"
-                                    placeholder="Ürün Kodu"
-                                    value={yeniUrun.productCode || ""}
-                                    onChange={(e) =>
-                                        setYeniUrun({
-                                            ...yeniUrun,
-                                            productCode: e.target.value
-                                        })
-                                    }
-                                />
-                                <input
-                                    className="form-control mb-2"
-                                    placeholder="Ürün Adı"
-                                    value={yeniUrun.productName || ""}
-                                    onChange={(e) =>
-                                        setYeniUrun({
-                                            ...yeniUrun,
-                                            productName: e.target.value
-                                        })
-                                    }
-                                />
-                                <input
-                                    className="form-control mb-2"
-                                    placeholder="Marka"
-                                    value={yeniUrun.brand || ""}
-                                    onChange={(e) =>
-                                        setYeniUrun({
-                                            ...yeniUrun,
-                                            brand: e.target.value
-                                        })
-                                    }
-                                />
-                                <input
-                                    className="form-control mb-2"
-                                    placeholder="Model"
-                                    value={yeniUrun.model || ""}
-                                    onChange={(e) =>
-                                        setYeniUrun({
-                                            ...yeniUrun,
-                                            model: e.target.value
-                                        })
-                                    }
-                                />
-                                <input
-                                    className="form-control mb-2"
-                                    placeholder="Kategori"
-                                    value={yeniUrun.category || ""}
-                                    onChange={(e) =>
-                                        setYeniUrun({
-                                            ...yeniUrun,
-                                            category: e.target.value
-                                        })
-                                    }
-                                />
-                                <input
-                                    className="form-control mb-2"
-                                    placeholder="Konum"
-                                    value={yeniUrun.location || ""}
-                                    onChange={(e) =>
-                                        setYeniUrun({
-                                            ...yeniUrun,
-                                            location: e.target.value
-                                        })
-                                    }
-                                />
+                                <div className="alert alert-info">
+                                    <h6 className="fw-bold">Otomatik Oluşturulacaklar</h6>
+                                    <ul className="mb-0">
+                                        <li>Ürün Kodu</li>
+                                        <li>QR Kod</li>
+                                        <li>Kayıt Tarihi</li>
+                                        <li>İlk Bakım Planı</li>
+                                    </ul>
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="fw-bold">Ürün Kodu</label>
+                                    <input
+                                        className="form-control"
+                                        value={
+                                            duzenlemeModu
+                                                ? yeniUrun.productCode
+                                                : "Otomatik oluşturulacaktır"
+                                        }
+                                        disabled
+                                    />
+                                    <small className="text-muted">
+                                        Sistem kayıt sırasında otomatik ürün kodu oluşturacaktır.
+                                    </small>
+                                </div>
+
+                                <div className="mb-2">
+                                    <input
+                                        className="form-control"
+                                        placeholder="Ürün Adı"
+                                        value={yeniUrun.productName || ""}
+                                        onChange={(e) =>
+                                            setYeniUrun({
+                                                ...yeniUrun,
+                                                productName: e.target.value
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div className="mb-2">
+                                    <input
+                                        className="form-control"
+                                        placeholder="Marka"
+                                        value={yeniUrun.brand || ""}
+                                        onChange={(e) =>
+                                            setYeniUrun({
+                                                ...yeniUrun,
+                                                brand: e.target.value
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div className="mb-2">
+                                    <input
+                                        className="form-control"
+                                        placeholder="Model"
+                                        value={yeniUrun.model || ""}
+                                        onChange={(e) =>
+                                            setYeniUrun({
+                                                ...yeniUrun,
+                                                model: e.target.value
+                                            })
+                                        }
+                                    />
+                                </div>
+
+                                <div className="mb-2">
+                                    <label className="fw-bold">Bakım Periyodu</label>
+                                    <small className="text-muted d-block mb-2">
+                                        Ürünün kaç günde bir bakıma gireceğini belirleyiniz.
+                                    </small>
+                                    <select
+                                        className="form-select"
+                                        value={yeniUrun.maintenancePeriodDay || 30}
+                                        onChange={(e) =>
+                                            setYeniUrun({
+                                                ...yeniUrun,
+                                                maintenancePeriodDay: Number(e.target.value)
+                                            })
+                                        }
+                                    >
+                                        <option value={15}>15 Gün</option>
+                                        <option value={30}>30 Gün</option>
+                                        <option value={45}>45 Gün</option>
+                                        <option value={60}>60 Gün</option>
+                                        <option value={90}>90 Gün</option>
+                                        <option value={180}>180 Gün</option>
+                                        <option value={365}>365 Gün</option>
+                                    </select>
+                                </div>
+
+                                <div className="mb-2">
+                                    <input
+                                        className="form-control"
+                                        placeholder="Konum"
+                                        value={yeniUrun.location || ""}
+                                        onChange={(e) =>
+                                            setYeniUrun({
+                                                ...yeniUrun,
+                                                location: e.target.value
+                                            })
+                                        }
+                                    />
+                                </div>
                             </div>
                             <div className="modal-footer">
                                 <button
@@ -306,7 +412,7 @@ function Urunler() {
                                     className="btn btn-success"
                                     onClick={urunKaydet}
                                 >
-                                    {duzenlemeModu ? "Güncelle" : "Kaydet"}
+                                    {duzenlemeModu ? "Güncelle" : "Ürünü Kaydet"}
                                 </button>
                             </div>
                         </div>
@@ -317,4 +423,4 @@ function Urunler() {
     );
 }
 
-export default Urunler; 
+export default Urunler;

@@ -15,6 +15,7 @@ namespace BakimAPI.Controllers
         {
             _context = context;
         }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Maintenance>>> GetMaintenances()
         {
@@ -60,13 +61,11 @@ namespace BakimAPI.Controllers
                 if (employee == null)
                     return BadRequest("Personel bulunamadı.");
 
-                product.IsInMaintenance = true;
-
-                product.LastMaintenanceDate = DateTime.Now;
-
-                product.NextMaintenanceDate = DateTime.Now.AddMonths(6);
-
                 maintenance.MaintenanceDate = DateTime.Now;
+
+                product.LastMaintenanceDate = maintenance.MaintenanceDate;
+                product.NextMaintenanceDate = maintenance.MaintenanceDate.AddDays(product.MaintenancePeriodDay);
+                product.IsInMaintenance = false;
 
                 _context.Maintenances.Add(maintenance);
 
@@ -79,6 +78,7 @@ namespace BakimAPI.Controllers
                 return BadRequest(ex.ToString());
             }
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMaintenance(int id, Maintenance maintenance)
         {
@@ -122,6 +122,7 @@ namespace BakimAPI.Controllers
 
             return NoContent();
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMaintenance(int id)
         {
@@ -136,6 +137,7 @@ namespace BakimAPI.Controllers
 
             return NoContent();
         }
+
         [HttpGet("upcoming")]
         public async Task<IActionResult> GetUpcomingMaintenances()
         {
@@ -150,6 +152,7 @@ namespace BakimAPI.Controllers
 
             return Ok(products);
         }
+
         [HttpGet("overdue")]
         public async Task<IActionResult> GetOverdueProducts()
         {

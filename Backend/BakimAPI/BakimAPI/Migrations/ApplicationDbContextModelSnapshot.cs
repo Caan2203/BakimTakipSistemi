@@ -104,6 +104,9 @@ namespace BakimAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AssignedEmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Brand")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -111,6 +114,9 @@ namespace BakimAPI.Migrations
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAssigned")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsInMaintenance")
                         .HasColumnType("bit");
@@ -121,6 +127,9 @@ namespace BakimAPI.Migrations
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaintenancePeriodDay")
+                        .HasColumnType("int");
 
                     b.Property<string>("Model")
                         .IsRequired()
@@ -144,6 +153,42 @@ namespace BakimAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("BakimAPI.Models.Zimmet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Aciklama")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("AktifMi")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("IadeTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("VerilisTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Zimmetler");
                 });
 
             modelBuilder.Entity("Employee", b =>
@@ -201,9 +246,35 @@ namespace BakimAPI.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("BakimAPI.Models.Zimmet", b =>
+                {
+                    b.HasOne("Employee", "Employee")
+                        .WithMany("Zimmetler")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BakimAPI.Models.Product", "Product")
+                        .WithMany("Zimmetler")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("BakimAPI.Models.Product", b =>
                 {
                     b.Navigation("Maintenances");
+
+                    b.Navigation("Zimmetler");
+                });
+
+            modelBuilder.Entity("Employee", b =>
+                {
+                    b.Navigation("Zimmetler");
                 });
 #pragma warning restore 612, 618
         }

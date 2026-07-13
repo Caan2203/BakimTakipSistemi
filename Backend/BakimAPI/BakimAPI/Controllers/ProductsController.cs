@@ -58,8 +58,20 @@ namespace BakimAPI.Controllers
         {
             try
             {
+                var sonUrun = await _context.Products
+                    .OrderByDescending(x => x.Id)
+                    .FirstOrDefaultAsync();
+
+                int yeniNo = sonUrun == null ? 1 : sonUrun.Id + 1;
+
+                product.ProductCode = $"URN-{DateTime.Now.Year}-{yeniNo:D4}";
+
                 product.QrCode = Guid.NewGuid().ToString();
 
+                product.LastMaintenanceDate = DateTime.Today;
+
+                product.NextMaintenanceDate =
+                    DateTime.Today.AddDays(product.MaintenancePeriodDay);
                 _context.Products.Add(product);
 
                 await _context.SaveChangesAsync();
@@ -92,6 +104,11 @@ namespace BakimAPI.Controllers
             existingProduct.Category = product.Category;
             existingProduct.Location = product.Location;
             existingProduct.IsInMaintenance = product.IsInMaintenance;
+
+            // Hata Çözümü: Bakım periyodu ve kritik tarih alanları aktarıldı
+            existingProduct.MaintenancePeriodDay = product.MaintenancePeriodDay;
+            existingProduct.LastMaintenanceDate = product.LastMaintenanceDate;
+            existingProduct.NextMaintenanceDate = product.NextMaintenanceDate;
 
             try
             {
@@ -148,6 +165,7 @@ namespace BakimAPI.Controllers
 
             return NoContent();
         }
+
         [HttpGet("upcoming")]
         public async Task<ActionResult<IEnumerable<Product>>> GetUpcomingProducts()
         {

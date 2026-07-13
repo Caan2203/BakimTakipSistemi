@@ -43,6 +43,14 @@ function Menu() {
                 <NavLink to="/qr-kod" className={menuClass}>
                     <span>QR Kod</span>
                 </NavLink>
+                <NavLink
+    to="/zimmetler"
+    className="nav-link"
+>
+    <i className="bi bi-person-badge me-2"></i>
+    Zimmetler
+</NavLink>
+                
 
                 <hr />
 
@@ -68,6 +76,7 @@ function Menu() {
                     <i className="bi bi-box-arrow-right me-2"></i>
                     Çıkış Yap
                 </button>
+                
             </nav>
         </aside>
     );
