@@ -17,3 +17,7 @@ export const personelGuncelle = async (id, personel) => {
 export const personelSil = async (id) => {
     await api.delete(`/Employees/${id}`);
 };
+export const personelDetayiGetir = async (id) => {
+    const response = await api.get(`/Employees/${id}/detail`);
+    return response.data;
+};

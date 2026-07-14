@@ -19,11 +19,13 @@ public class Product
 
     public string Location { get; set; } = "";
 
-    public bool IsInMaintenance { get; set; }
+    public bool IsInMaintenance { get; set; }                   
 
     public bool IsAssigned { get; set; } = false;
 
     public int? AssignedEmployeeId { get; set; }
+
+    public Employee? AssignedEmployee { get; set; }
 
     public string QrCode { get; set; } = "";
     public DateTime? LastMaintenanceDate { get; set; }
@@ -36,4 +38,8 @@ public class Product
 
     public ICollection<Zimmet> Zimmetler { get; set; }
     = new List<Zimmet>();
+    public ICollection<ProductHistory> ProductHistories { get; set; }
+    = new List<ProductHistory>();
+
+    public bool IsDeleted { get; set; } = false;
 }

@@ -13,23 +13,27 @@ import ProductDetail from "./sayfalar/ProductDetail";
 import BakimEkle from "./sayfalar/BakimEkle";
 import BakimDuzenle from "./sayfalar/BakimDuzenle";
 import Zimmetler from "./sayfalar/Zimmetler";
+import UrunGecmisi from "./sayfalar/UrunGecmisi";
+import PersonelDetay from "./sayfalar/PersonelDetay";
+
 function App() {
     return (
         <Routes>
-
+            {/* Giriş Sayfası (Layout dışı ve herkese açık) */}
             <Route
                 path="/giris"
                 element={<Giris />}
             />
 
+            {/* Yetkili ve Layout (AnaDuzen) Kullanan Tüm Sayfalar */}
             <Route
-    element={
-        <YetkiliSayfa>
-            <AnaDuzen />
-        </YetkiliSayfa>
-    }
->
-
+                element={
+                    <YetkiliSayfa>
+                        <AnaDuzen />
+                    </YetkiliSayfa>
+                }
+            >
+                {/* Ana sayfa yönlendirmesi */}
                 <Route
                     path="/"
                     element={<Navigate to="/gosterge-paneli" />}
@@ -48,6 +52,12 @@ function App() {
                 <Route
                     path="/personeller"
                     element={<Personeller />}
+                />
+
+                {/* Import edilmiş olan Personel Detay rotası eklendi */}
+                <Route
+                    path="/personeller/:id"
+                    element={<PersonelDetay />}
                 />
 
                 <Route
@@ -79,10 +89,19 @@ function App() {
                     path="/bakim-duzenle/:id"
                     element={<BakimDuzenle />}
                 />
-                
-            </Route>
-            <Route path="/zimmetler" element={<Zimmetler />} />
 
+                {/* Tasarım bütünlüğü ve yetki kontrolü için içeriye taşınan rotalar */}
+                <Route 
+                    path="/zimmetler" 
+                    element={<Zimmetler />} 
+                />
+                
+                <Route 
+                    path="/urun-gecmisi/:id" 
+                    element={<UrunGecmisi />} 
+                />
+   
+            </Route>
         </Routes>
     );
 }

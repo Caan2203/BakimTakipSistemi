@@ -118,6 +118,9 @@ namespace BakimAPI.Migrations
                     b.Property<bool>("IsAssigned")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsInMaintenance")
                         .HasColumnType("bit");
 
@@ -152,7 +155,41 @@ namespace BakimAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssignedEmployeeId");
+
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("BakimAPI.Models.ProductHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmployeeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductHistories");
                 });
 
             modelBuilder.Entity("BakimAPI.Models.Zimmet", b =>
@@ -246,6 +283,26 @@ namespace BakimAPI.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("BakimAPI.Models.Product", b =>
+                {
+                    b.HasOne("Employee", "AssignedEmployee")
+                        .WithMany()
+                        .HasForeignKey("AssignedEmployeeId");
+
+                    b.Navigation("AssignedEmployee");
+                });
+
+            modelBuilder.Entity("BakimAPI.Models.ProductHistory", b =>
+                {
+                    b.HasOne("BakimAPI.Models.Product", "Product")
+                        .WithMany("ProductHistories")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("BakimAPI.Models.Zimmet", b =>
                 {
                     b.HasOne("Employee", "Employee")
@@ -268,6 +325,8 @@ namespace BakimAPI.Migrations
             modelBuilder.Entity("BakimAPI.Models.Product", b =>
                 {
                     b.Navigation("Maintenances");
+
+                    b.Navigation("ProductHistories");
 
                     b.Navigation("Zimmetler");
                 });

@@ -44,4 +44,51 @@ public class ZimmetController : ControllerBase
 
         return Ok(zimmet);
     }
+    [HttpPut("iade/{id}")]
+    public async Task<IActionResult> IadeEt(int id)
+    {
+        var zimmet = await _context.Zimmetler
+            .Include(z => z.Product)
+            .FirstOrDefaultAsync(z => z.Id == id);
+
+        if (zimmet == null)
+            return NotFound("Zimmet bulunamadı.");
+
+        if (!zimmet.AktifMi)
+            return BadRequest("Bu zimmet zaten iade edilmiş.");
+
+        zimmet.AktifMi = false;
+        zimmet.IadeTarihi = DateTime.Now;
+
+        if (zimmet.Product != null)
+        {
+            zimmet.Product.IsAssigned = false;
+            zimmet.Product.AssignedEmployeeId = null;
+        }
+
+        await _context.SaveChangesAsync();
+
+        return Ok("Ürün başarıyla iade edildi.");
+    }
+    [HttpGet("product/{productId}")]
+    public async Task<ActionResult<IEnumerable<Zimmet>>> GetProductHistory(int productId)
+    {
+        var gecmis = await _context.Zimmetler
+            .Include(z => z.Employee)
+            .Where(z => z.ProductId == productId)
+            .OrderByDescending(z => z.VerilisTarihi)
+            .ToListAsync();
+
+        return Ok(gecmis);
+    }
+    [HttpGet("employee/{employeeId}/active")]
+    public async Task<IActionResult> GetActiveAssignments(int employeeId)
+    {
+        var aktifler = await _context.Zimmetler
+            .Include(z => z.Product)
+            .Where(z => z.EmployeeId == employeeId && z.AktifMi)
+            .ToListAsync();
+
+        return Ok(aktifler);
+    }
 }

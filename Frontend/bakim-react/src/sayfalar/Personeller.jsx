@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     personelleriGetir,
     personelEkle,
@@ -7,7 +8,7 @@ import {
 } from "../services/personelServisi";
 
 function Personeller() {
-
+    const navigate = useNavigate();
     const [personeller, setPersoneller] = useState([]);
 
     const [duzenlemeModu, setDuzenlemeModu] = useState(false);
@@ -164,6 +165,12 @@ function Personeller() {
                                 >
                                     Düzenle
                                 </button>
+                                <button
+    className="btn btn-info btn-sm me-2"
+    onClick={() => navigate(`/personeller/${personel.id}`)}
+>
+    Detay
+</button>
 
                                 <button
                                     className="btn btn-danger btn-sm"

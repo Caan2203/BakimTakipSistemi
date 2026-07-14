@@ -70,5 +70,18 @@ namespace BakimAPI.Controllers
 
             return NoContent();
         }
+        [HttpGet("{id}/detail")]
+        public async Task<IActionResult> GetEmployeeDetail(int id)
+        {
+            var employee = await _context.Employees
+                .Include(e => e.Zimmetler)
+                    .ThenInclude(z => z.Product)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (employee == null)
+                return NotFound();
+
+            return Ok(employee);
+        }
     }
 }

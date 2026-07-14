@@ -9,10 +9,10 @@ public class Zimmet
     [Required]
     public int ProductId { get; set; }
 
-    public Product? Product { get; set; }
-
     [Required]
     public int EmployeeId { get; set; }
+
+    public Product? Product { get; set; }
 
     public Employee? Employee { get; set; }
 

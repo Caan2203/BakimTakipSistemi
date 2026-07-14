@@ -37,6 +37,12 @@ function Urunler() {
     };
 
     const urunKaydet = async () => {
+        // Form alanlarının doluluk kontrolü
+        if (!yeniUrun.productName) {
+            alert("Ürün seçiniz"); // Veya "Ürün adı giriniz"
+            return;
+        }
+
         try {
             if (duzenlemeModu) {
                 await urunGuncelle(yeniUrun.id, yeniUrun);
@@ -259,6 +265,12 @@ function Urunler() {
                                                         }
                                                     >
                                                         Bakım Yap
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-dark btn-sm"
+                                                        onClick={() => navigate(`/urun-gecmisi/${urun.id}`)}
+                                                    >
+                                                        <i className="bi bi-clock-history"></i> Geçmiş
                                                     </button>
                                                 </div>
                                             </td>

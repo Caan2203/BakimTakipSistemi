@@ -36,21 +36,25 @@ namespace BakimAPI.Controllers
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             return await _context.Products
-                .OrderBy(x => x.ProductName)
-                .ToListAsync();
+     .Where(x => !x.IsDeleted)
+     .OrderBy(x => x.ProductName)
+     .ToListAsync(); ;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        [HttpGet("{id}/detail")]
+        public async Task<IActionResult> GetProductDetail(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products
+                .Include(x => x.Zimmetler.OrderByDescending(z => z.VerilisTarihi))
+                    .ThenInclude(z => z.Employee)
+                .Include(x => x.Maintenances)
+                    .ThenInclude(m => m.Employee)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (product == null)
-            {
                 return NotFound();
-            }
 
-            return product;
+            return Ok(product);
         }
 
         [HttpPost]
@@ -76,7 +80,7 @@ namespace BakimAPI.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+                return Ok(product);
             }
             catch (Exception ex)
             {
@@ -159,7 +163,17 @@ namespace BakimAPI.Controllers
                 return NotFound();
             }
 
-            _context.Products.Remove(product);
+            product.IsDeleted = true;
+
+            await LogEkle(
+                product.Id,
+                "Ürün Pasife Alındı",
+                $"{product.ProductName} pasife alındı."
+            );
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
 
             await _context.SaveChangesAsync();
 
@@ -181,6 +195,37 @@ namespace BakimAPI.Controllers
                 .ToListAsync();
 
             return Ok(products);
+        }
+
+        [HttpGet("available")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetAvailableProducts()
+        {
+            var products = await _context.Products
+                .Where(p => !p.IsAssigned)
+                .OrderBy(p => p.ProductName)
+                .ToListAsync();
+
+            return Ok(products);
+        }
+
+        private async Task LogEkle(
+            int productId,
+            string action,
+            string description,
+            string? employee = null)
+        {
+            var log = new ProductHistory
+            {
+                ProductId = productId,
+                Action = action,
+                Description = description,
+                EmployeeName = employee,
+                Date = DateTime.Now
+            };
+
+            _context.ProductHistories.Add(log);
+
+            await _context.SaveChangesAsync();
         }
 
         private bool ProductExists(int id)
