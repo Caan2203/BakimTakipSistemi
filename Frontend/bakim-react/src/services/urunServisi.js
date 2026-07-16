@@ -33,4 +33,15 @@ export const urunDetayiGetir = async (id) => {
 export const urunLoglariniGetir = async (id) => {
     const response = await api.get(`/Products/${id}/history`);
     return response.data;
-};    
+};   
+export const urunGecmisiGetir = async (id) => {
+    const response = await api.get(`/UrunGecmisi/urun/${id}`);
+    return response.data;
+};
+export const urunHareketleriniGetir = async (id) => {
+
+    const response = await api.get(`/ProductHistory/${id}`);
+
+    return response.data;
+
+};

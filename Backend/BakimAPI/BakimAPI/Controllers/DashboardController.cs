@@ -2,6 +2,7 @@
 using BakimAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BakimAPI.DTOs;
 
 namespace BakimAPI.Controllers
 {
@@ -89,7 +90,14 @@ namespace BakimAPI.Controllers
                     x.MaintenanceDate.Year == tarih.Year);
 
                 dashboard.MonthlyMaintenanceCounts.Add(adet);
+
+
             }
+            dashboard.LastProductActions =
+    await _context.ProductHistories
+        .OrderByDescending(x => x.Date)
+        .Take(10)
+        .ToListAsync();
 
             return Ok(dashboard);
         }

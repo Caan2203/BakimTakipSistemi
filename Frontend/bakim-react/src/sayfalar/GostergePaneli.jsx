@@ -66,13 +66,14 @@ function GostergePaneli() {
     ]
   };
 
-  // Güvenli listeler oluşturuldu
   const upcomingProducts = dashboard.upcomingProducts || [];
   const overdueProducts = dashboard.overdueProducts || [];
 
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Gösterge Paneli</h2>
+      
+      {/* İstatistik Kartları */}
       <div className="row">
         <div className="col-md-3 mb-3">
           <div className="card shadow h-100">
@@ -107,6 +108,8 @@ function GostergePaneli() {
           </div>
         </div>
       </div>
+
+      {/* Durum Kartları */}
       <div className="row">
         <div className="col-md-6 mb-3">
           <div className="card border-success shadow h-100">
@@ -129,6 +132,8 @@ function GostergePaneli() {
           </div>
         </div>
       </div>
+
+      {/* Grafik */}
       <div className="card shadow">
         <div className="card-header">
           <h5 className="mb-0">Son 6 Ay Bakım Grafiği</h5>
@@ -137,6 +142,8 @@ function GostergePaneli() {
           <Line data={grafikVerisi} />
         </div>
       </div>
+
+      {/* Yaklaşan ve Geciken Ürünler Listesi */}
       <div className="row mt-4">
         <div className="col-md-6 mb-3">
           <div className="card shadow border-success h-100">
@@ -163,6 +170,7 @@ function GostergePaneli() {
             </div>
           </div>
         </div>
+        
         <div className="col-md-6 mb-3">
           <div className="card shadow border-danger h-100">
             <div className="card-header bg-danger text-white">
@@ -186,6 +194,8 @@ function GostergePaneli() {
           </div>
         </div>
       </div>
+
+      {/* Son Yapılan Bakımlar Tablosu */}
       <div className="card shadow mt-4">
         <div className="card-header">
           <h5 className="mb-0">Son Yapılan Bakımlar</h5>
@@ -227,6 +237,48 @@ function GostergePaneli() {
           </table>
         </div>
       </div>
+
+      {/* Son Ürün Hareketleri Kartı (Tablonun tamamen dışına, doğru hiyerarşiye alındı) */}
+      <div className="card shadow mt-4">
+        <div className="card-header bg-dark text-white">
+          <h5 className="mb-0">Son Ürün Hareketleri</h5>
+        </div>
+        <div className="card-body">
+          <table className="table table-hover">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>İşlem</th>
+                <th>Açıklama</th>
+                <th>Personel</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dashboard.lastProductActions?.length === 0 ? (
+                <tr>
+                  <td colSpan="4">Hareket bulunamadı.</td>
+                </tr>
+              ) : (
+                dashboard.lastProductActions?.map((item) => (
+                  <tr key={item.id}>
+                    <td>
+                      {new Date(item.date).toLocaleString("tr-TR")}
+                    </td>
+                    <td>
+                      <span className="badge bg-primary">
+                        {item.action}
+                      </span>
+                    </td>
+                    <td>{item.description}</td>
+                    <td>{item.employeeName}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   );
 }

@@ -15,17 +15,16 @@ import BakimDuzenle from "./sayfalar/BakimDuzenle";
 import Zimmetler from "./sayfalar/Zimmetler";
 import UrunGecmisi from "./sayfalar/UrunGecmisi";
 import PersonelDetay from "./sayfalar/PersonelDetay";
+import QRUrunDetay from "./sayfalar/QRUrunDetay";
 
 function App() {
     return (
         <Routes>
-            {/* Giriş Sayfası (Layout dışı ve herkese açık) */}
+
             <Route
                 path="/giris"
                 element={<Giris />}
             />
-
-            {/* Yetkili ve Layout (AnaDuzen) Kullanan Tüm Sayfalar */}
             <Route
                 element={
                     <YetkiliSayfa>
@@ -33,7 +32,6 @@ function App() {
                     </YetkiliSayfa>
                 }
             >
-                {/* Ana sayfa yönlendirmesi */}
                 <Route
                     path="/"
                     element={<Navigate to="/gosterge-paneli" />}
@@ -54,7 +52,6 @@ function App() {
                     element={<Personeller />}
                 />
 
-                {/* Import edilmiş olan Personel Detay rotası eklendi */}
                 <Route
                     path="/personeller/:id"
                     element={<PersonelDetay />}
@@ -90,7 +87,6 @@ function App() {
                     element={<BakimDuzenle />}
                 />
 
-                {/* Tasarım bütünlüğü ve yetki kontrolü için içeriye taşınan rotalar */}
                 <Route 
                     path="/zimmetler" 
                     element={<Zimmetler />} 
@@ -100,7 +96,7 @@ function App() {
                     path="/urun-gecmisi/:id" 
                     element={<UrunGecmisi />} 
                 />
-   
+               <Route path="/qr/:qrCode" element={<QRUrunDetay />} />
             </Route>
         </Routes>
     );

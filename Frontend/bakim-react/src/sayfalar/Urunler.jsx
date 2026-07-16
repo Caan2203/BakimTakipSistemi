@@ -9,6 +9,7 @@ import {
 
 function Urunler() {
     const [urunler, setUrunler] = useState([]);
+    const [kategoriFiltre, setKategoriFiltre] = useState("");
     const [duzenlemeModu, setDuzenlemeModu] = useState(false);
     const [modalAcik, setModalAcik] = useState(false);
     const [aramaMetni, setAramaMetni] = useState("");
@@ -79,14 +80,22 @@ function Urunler() {
         }
     };
 
+    // Filtreleme mantığı: Arama metni ve Kategori filtresi birlikte değerlendirilir
     const filtrelenmisUrunler = urunler.filter((urun) => {
         const arama = aramaMetni.toLowerCase();
-        return (
-            urun.productName?.toLowerCase().includes(arama) ||
-            urun.productCode?.toLowerCase().includes(arama) ||
-            urun.brand?.toLowerCase().includes(arama) ||
-            urun.model?.toLowerCase().includes(arama)
-        );
+        
+        // İsim, kod, marka veya model eşleşme kontrolü
+        const isimEslesti = urun.productName?.toLowerCase().includes(arama);
+        const kodEslesti = urun.productCode?.toLowerCase().includes(arama);
+        const markaEslesti = urun.brand?.toLowerCase().includes(arama);
+        const modelEslesti = urun.model?.toLowerCase().includes(arama);
+
+        // Kategori eşleşme kontrolü
+        const kategoriEslesti = 
+            kategoriFiltre === "" || 
+            urun.category === kategoriFiltre;
+
+        return (isimEslesti || kodEslesti || markaEslesti || modelEslesti) && kategoriEslesti;
     });
 
     // Tablo hücreleri için padding kuralı
@@ -131,7 +140,8 @@ function Urunler() {
             <div className="card shadow-sm border-0 mb-4">
                 <div className="card-body">
                     <div className="row align-items-center">
-                        <div className="col-md-8">
+                        {/* Arama Kutusu */}
+                        <div className="col-md-6">
                             <input
                                 type="text"
                                 className="form-control form-control-lg"
@@ -140,7 +150,23 @@ function Urunler() {
                                 onChange={(e) => setAramaMetni(e.target.value)}
                             />
                         </div>
-                        <div className="col-md-4 text-end">
+                        {/* Kategori Seçici Filtresi */}
+                        <div className="col-md-3">
+                            <select
+                                className="form-select form-select-lg"
+                                value={kategoriFiltre}
+                                onChange={(e) => setKategoriFiltre(e.target.value)}
+                            >
+                                <option value="">Tüm Kategoriler</option>
+                                <option>Bilgisayar</option>
+                                <option>Monitör</option>
+                                <option>Yazıcı</option>
+                                <option>Telefon</option>
+                                <option>Sunucu</option>
+                            </select>
+                        </div>
+                        {/* Toplam Ürün Bilgisi */}
+                        <div className="col-md-3 text-end">
                             <span className="badge bg-primary p-3 fs-6">
                                 Toplam Ürün : {urunler.length}
                             </span>

@@ -56,9 +56,10 @@ namespace BakimAPI.Controllers
                 if (product == null)
                     return BadRequest("Ürün bulunamadı.");
 
-                var employee = await _context.Employees.FindAsync(maintenance.EmployeeId);
+                // employees nesnesini burada tek bir kez çekerek aşağıdaki null kontrolünü ve loglamayı güvenli hale getirdik.
+                var employees = await _context.Employees.FindAsync(maintenance.EmployeeId);
 
-                if (employee == null)
+                if (employees == null)
                     return BadRequest("Personel bulunamadı.");
 
                 maintenance.MaintenanceDate = DateTime.Now;
@@ -68,6 +69,15 @@ namespace BakimAPI.Controllers
                 product.IsInMaintenance = false;
 
                 _context.Maintenances.Add(maintenance);
+
+                _context.ProductHistories.Add(new ProductHistory
+                {
+                    ProductId = maintenance.ProductId,
+                    Action = "Bakım Yapıldı",
+                    Description = maintenance.Description,
+                    EmployeeName = $"{employees!.FirstName} {employees.LastName}",
+                    Date = DateTime.Now
+                });
 
                 await _context.SaveChangesAsync();
 
@@ -107,6 +117,16 @@ namespace BakimAPI.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                // Güncelleme işlemi bittikten hemen sonra log ekleyip tekrar kaydediyoruz.
+                _context.ProductHistories.Add(new ProductHistory
+                {
+                    ProductId = maintenance.ProductId,
+                    Action = "Bakım Güncellendi",
+                    Description = "Bakım kaydı güncellendi.",
+                    Date = DateTime.Now
+                });
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -131,8 +151,16 @@ namespace BakimAPI.Controllers
             if (maintenance == null)
                 return NotFound();
 
-            _context.Maintenances.Remove(maintenance);
+            // Silme işleminden hemen önce log atıp ardından siliyoruz.
+            _context.ProductHistories.Add(new ProductHistory
+            {
+                ProductId = maintenance.ProductId,
+                Action = "Bakım Silindi",
+                Description = "Bakım kaydı silindi.",
+                Date = DateTime.Now
+            });
 
+            _context.Maintenances.Remove(maintenance);
             await _context.SaveChangesAsync();
 
             return NoContent();

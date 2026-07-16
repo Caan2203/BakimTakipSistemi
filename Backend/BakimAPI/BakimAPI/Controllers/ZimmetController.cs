@@ -39,11 +39,29 @@ public class ZimmetController : ControllerBase
 
         product.IsAssigned = true;
         product.AssignedEmployeeId = zimmet.EmployeeId;
+        zimmet.VerilisTarihi = DateTime.Now;
         _context.Zimmetler.Add(zimmet);
+
+        var employee = await _context.Employees.FindAsync(zimmet.EmployeeId);
+
+        _context.ProductHistories.Add(new ProductHistory
+        {
+            ProductId = zimmet.ProductId,
+            Action = "Zimmet Verildi",
+            Description =
+                $"{employee!.FirstName} {employee.LastName} personeline zimmet verildi.",
+
+            EmployeeName =
+                $"{employee.FirstName} {employee.LastName}",
+
+            Date = DateTime.Now
+        });
+
         await _context.SaveChangesAsync();
 
         return Ok(zimmet);
     }
+
     [HttpPut("iade/{id}")]
     public async Task<IActionResult> IadeEt(int id)
     {
@@ -57,8 +75,8 @@ public class ZimmetController : ControllerBase
         if (!zimmet.AktifMi)
             return BadRequest("Bu zimmet zaten iade edilmiş.");
 
-        zimmet.AktifMi = false;
         zimmet.IadeTarihi = DateTime.Now;
+        zimmet.AktifMi = false;
 
         if (zimmet.Product != null)
         {
@@ -66,10 +84,23 @@ public class ZimmetController : ControllerBase
             zimmet.Product.AssignedEmployeeId = null;
         }
 
+        var employee = await _context.Employees.FindAsync(zimmet.EmployeeId);
+        _context.ProductHistories.Add(new ProductHistory
+        {
+            ProductId = zimmet.ProductId,
+            Action = "Zimmet İade",
+            Description =
+                $"{employee!.FirstName} {employee.LastName} personelinden teslim alındı.",
+            EmployeeName =
+                $"{employee.FirstName} {employee.LastName}",
+            Date = DateTime.Now
+        });
+
         await _context.SaveChangesAsync();
 
         return Ok("Ürün başarıyla iade edildi.");
     }
+
     [HttpGet("product/{productId}")]
     public async Task<ActionResult<IEnumerable<Zimmet>>> GetProductHistory(int productId)
     {
@@ -81,6 +112,7 @@ public class ZimmetController : ControllerBase
 
         return Ok(gecmis);
     }
+
     [HttpGet("employee/{employeeId}/active")]
     public async Task<IActionResult> GetActiveAssignments(int employeeId)
     {

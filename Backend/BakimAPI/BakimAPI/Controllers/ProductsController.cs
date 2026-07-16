@@ -23,22 +23,63 @@ namespace BakimAPI.Controllers
         {
             var product = await _context.Products
                 .Include(p => p.Maintenances)
-                .ThenInclude(m => m.Employee)
+                    .ThenInclude(m => m.Employee)
+                .Include(p => p.Zimmetler)
+                    .ThenInclude(z => z.Employee)
                 .FirstOrDefaultAsync(p => p.QrCode == qrCode);
 
             if (product == null)
                 return NotFound();
 
-            return Ok(product);
+            var aktifZimmet = product.Zimmetler
+                .Where(z => z.AktifMi)
+                .OrderByDescending(z => z.VerilisTarihi)
+                .FirstOrDefault();
+
+            var result = new
+            {
+                product.Id,
+                product.ProductName,
+                product.ProductCode,
+                product.Brand,
+                product.Model,
+                product.Category,
+                product.Location,
+                product.IsInMaintenance,
+                product.LastMaintenanceDate,
+                product.NextMaintenanceDate,
+
+                CurrentAssignment = aktifZimmet == null ? null : new
+                {
+                    Employee = $"{aktifZimmet.Employee?.FirstName} {aktifZimmet.Employee?.LastName}",
+                    aktifZimmet.Employee?.Department,
+                    aktifZimmet.VerilisTarihi
+                },
+
+                Maintenances = product.Maintenances
+                    .OrderByDescending(x => x.MaintenanceDate)
+                    .Take(5)
+                    .Select(x => new
+                    {
+                        x.MaintenanceDate,
+                        x.Status,
+                        x.Description,
+                        Employee = x.Employee != null
+                            ? $"{x.Employee.FirstName} {x.Employee.LastName}"
+                            : ""
+                    })
+            };
+
+            return Ok(result);
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             return await _context.Products
-     .Where(x => !x.IsDeleted)
-     .OrderBy(x => x.ProductName)
-     .ToListAsync(); ;
+                 .Where(x => !x.IsDeleted)
+                 .OrderBy(x => x.ProductName)
+                 .ToListAsync();
         }
 
         [HttpGet("{id}/detail")]
@@ -69,16 +110,18 @@ namespace BakimAPI.Controllers
                 int yeniNo = sonUrun == null ? 1 : sonUrun.Id + 1;
 
                 product.ProductCode = $"URN-{DateTime.Now.Year}-{yeniNo:D4}";
-
                 product.QrCode = Guid.NewGuid().ToString();
-
                 product.LastMaintenanceDate = DateTime.Today;
+                product.NextMaintenanceDate = DateTime.Today.AddDays(product.MaintenancePeriodDay);
 
-                product.NextMaintenanceDate =
-                    DateTime.Today.AddDays(product.MaintenancePeriodDay);
                 _context.Products.Add(product);
-
                 await _context.SaveChangesAsync();
+
+                await LogEkle(
+                    product.Id,
+                    "Ürün Oluşturuldu",
+                    $"{product.ProductName} sisteme eklendi."
+                );
 
                 return Ok(product);
             }
@@ -108,8 +151,6 @@ namespace BakimAPI.Controllers
             existingProduct.Category = product.Category;
             existingProduct.Location = product.Location;
             existingProduct.IsInMaintenance = product.IsInMaintenance;
-
-            // Hata Çözümü: Bakım periyodu ve kritik tarih alanları aktarıldı
             existingProduct.MaintenancePeriodDay = product.MaintenancePeriodDay;
             existingProduct.LastMaintenanceDate = product.LastMaintenanceDate;
             existingProduct.NextMaintenanceDate = product.NextMaintenanceDate;
@@ -117,6 +158,11 @@ namespace BakimAPI.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                await LogEkle(
+                    existingProduct.Id,
+                    "Ürün Güncellendi",
+                    $"{existingProduct.ProductName} bilgileri güncellendi."
+                );
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -133,6 +179,17 @@ namespace BakimAPI.Controllers
             return NoContent();
         }
 
+        [HttpGet("{id}/history")]
+        public async Task<IActionResult> GetHistory(int id)
+        {
+            var history = await _context.ProductHistories
+                .Where(x => x.ProductId == id)
+                .OrderByDescending(x => x.Date)
+                .ToListAsync();
+
+            return Ok(history);
+        }
+
         [HttpGet("qr-image/{id}")]
         public async Task<IActionResult> GetQrImage(int id)
         {
@@ -140,14 +197,12 @@ namespace BakimAPI.Controllers
 
             if (product == null)
                 return NotFound();
-
-            string qrText = $"http://localhost:5173/product/{product.QrCode}";
+            string qrText = $"http://localhost:5173/urun/{product.QrCode}";
 
             using var qrGenerator = new QRCodeGenerator();
             using var qrData = qrGenerator.CreateQrCode(qrText, QRCodeGenerator.ECCLevel.Q);
 
             var pngQr = new PngByteQRCode(qrData);
-
             byte[] qrBytes = pngQr.GetGraphic(20);
 
             return File(qrBytes, "image/png");
@@ -170,13 +225,6 @@ namespace BakimAPI.Controllers
                 "Ürün Pasife Alındı",
                 $"{product.ProductName} pasife alındı."
             );
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-
-            await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
@@ -224,8 +272,19 @@ namespace BakimAPI.Controllers
             };
 
             _context.ProductHistories.Add(log);
-
             await _context.SaveChangesAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Product>> GetProduct(int id)
+        {
+            var product = await _context.Products
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (product == null)
+                return NotFound();
+
+            return Ok(product);
         }
 
         private bool ProductExists(int id)

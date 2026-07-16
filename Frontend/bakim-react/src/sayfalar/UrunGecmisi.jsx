@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { urunDetayiGetir } from "../services/urunServisi";
+import { urunDetayiGetir, urunHareketleriniGetir } from "../services/urunServisi";
 
 function UrunGecmisi() {
     const { id } = useParams();
     const [urun, setUrun] = useState(null);
+    const [hareketler, setHareketler] = useState([]);
 
     useEffect(() => {
         yukle();
@@ -13,6 +14,8 @@ function UrunGecmisi() {
     const yukle = async () => {
         const data = await urunDetayiGetir(id);
         setUrun(data);
+        const history = await urunHareketleriniGetir(id);
+        setHareketler(history);
     };
 
     if (!urun)
@@ -25,9 +28,13 @@ function UrunGecmisi() {
             </div>
         );
 
-    const aktifZimmet = urun.zimmetler?.find(x => x.aktifMi);
+    // Backend'den gelen currentAssignment (veya CurrentAssignment) nesnesini kontrol et, yoksa diziden bul.
+    const aktifZimmet = urun.currentAssignment || urun.CurrentAssignment || urun.zimmetler?.find(x => x.aktifMi);
 
-    // Kronolojik Zaman Tüneli (Hareket Geçmişi) için verileri birleştirip sıralıyoruz
+    const toplamBakim = urun.maintenances?.length || 0;
+    const toplamZimmet = urun.zimmetler?.length || 0;
+    const bakimPeriyodu = urun.maintenancePeriodDay || 0;
+
     const zimmetLoglari = (urun.zimmetler || []).map(z => ({
         tarih: new Date(z.verilisTarihi),
         icon: "🟢",
@@ -44,15 +51,12 @@ function UrunGecmisi() {
 
     return (
         <div className="container mt-4">
-            {/* Üst Başlık */}
             <div className="d-flex align-items-center justify-content-between mb-3">
                 <h2>📦 Ürün Hareket Geçmişi</h2>
             </div>
             <hr />
 
-            {/* Bölüm 1: Ürün Genel Bilgileri ve Güncel Zimmet */}
             <div className="row mb-4">
-                {/* Ürün Detay Kartı */}
                 <div className="col-lg-7 mb-4 mb-lg-0">
                     <div className="card shadow-sm border-0 h-100">
                         <div className="card-header bg-primary text-white py-3">
@@ -81,7 +85,6 @@ function UrunGecmisi() {
                     </div>
                 </div>
 
-                {/* Güncel Zimmet Durumu */}
                 <div className="col-lg-5">
                     <div className="card shadow-sm border-0 h-100">
                         <div className="card-header bg-success text-white py-3">
@@ -91,8 +94,13 @@ function UrunGecmisi() {
                             {aktifZimmet ? (
                                 <div className="p-3 bg-light rounded border-start border-success border-4">
                                     <h5 className="text-success mb-1">
-                                        👤 {aktifZimmet.employee?.firstName} {aktifZimmet.employee?.lastName}
+                                        👤 {aktifZimmet.employeeName || (aktifZimmet.employee ? `${aktifZimmet.employee.firstName} ${aktifZimmet.employee.lastName}` : aktifZimmet.Employee || "-")}
                                     </h5>
+                                    {aktifZimmet.department && (
+                                        <p className="mb-1 text-muted small">
+                                            <b>Departman:</b> {aktifZimmet.department}
+                                        </p>
+                                    )}
                                     <p className="mb-0 text-muted">
                                         <b>Teslim Tarihi:</b>{" "}
                                         {aktifZimmet.verilisTarihi ? new Date(aktifZimmet.verilisTarihi).toLocaleDateString("tr-TR") : "-"}
@@ -108,13 +116,14 @@ function UrunGecmisi() {
                 </div>
             </div>
 
-            {/* Bölüm 2: İstatistik Kartları */}
             <div className="row mb-4">
                 <div className="col-md-4 mb-3 mb-md-0">
-                    <div className="card text-center shadow-sm border-0 border-start  border-4">
+                    <div className="card text-center shadow-sm border-0 border-start border-4">
                         <div className="card-body">
                             <span className="text-muted text-uppercase small fw-bold">Toplam Bakım</span>
-                            <h2 className="text mt-2 mb-0">{urun.maintenances?.length || 0}</h2>
+                            <h2 className={`mt-2 mb-0 fw-bold ${toplamBakim === 0 ? "text-danger" : "text-success"}`}>
+                                {toplamBakim}
+                            </h2>
                         </div>
                     </div>
                 </div>
@@ -122,7 +131,9 @@ function UrunGecmisi() {
                     <div className="card text-center shadow-sm border-0 border-start border-4">
                         <div className="card-body">
                             <span className="text-muted text-uppercase small fw-bold">Toplam Zimmet</span>
-                            <h2 className="text mt-2 mb-0">{urun.zimmetler?.length || 0}</h2>
+                            <h2 className={`mt-2 mb-0 fw-bold ${toplamZimmet === 0 ? "text-danger" : "text-success"}`}>
+                                {toplamZimmet}
+                            </h2>
                         </div>
                     </div>
                 </div>
@@ -130,13 +141,14 @@ function UrunGecmisi() {
                     <div className="card text-center shadow-sm border-0 border-start border-4">
                         <div className="card-body">
                             <span className="text-muted text-uppercase small fw-bold">Bakım Periyodu</span>
-                            <h2 className="text-danger mt-2 mb-0">{urun.maintenancePeriodDay} Gün</h2>
+                            <h2 className={`mt-2 mb-0 fw-bold ${bakimPeriyodu === 0 ? "text-danger" : "text-success"}`}>
+                                {bakimPeriyodu} Gün
+                            </h2>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Bölüm 3: Bakım Geçmişi Tablosu */}
             <div className="card shadow-sm border-0 mb-4">
                 <div className="card-header bg-warning text-dark py-3">
                     <h5 className="mb-0">🔧 Bakım Geçmişi</h5>
@@ -183,7 +195,6 @@ function UrunGecmisi() {
                 </div>
             </div>
 
-            {/* Bölüm 4: Zimmet Geçmişi Tablosu */}
             <div className="card shadow-sm border-0 mb-4">
                 <div className="card-header bg-secondary text-white py-3">
                     <h5 className="mb-0">📋 Zimmet Geçmişi</h5>
@@ -236,7 +247,6 @@ function UrunGecmisi() {
                 </div>
             </div>
 
-            {/* Bölüm 5: Kronolojik Zaman Tüneli */}
             <div className="card shadow-sm border-0 mb-4">
                 <div className="card-header bg-dark text-white py-3">
                     <h5 className="mb-0">📜 Genel Hareket Geçmişi</h5>
