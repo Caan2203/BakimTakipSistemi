@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+
 import {
     bakimlariGetir,
     bakimEkle,
     bakimGuncelle,
-    bakimSil
+    bakimSil,
+    bakimExcelIndir
 } from "../services/maintenanceServisi";
 
 import { urunleriGetir } from "../services/urunServisi";
@@ -59,15 +62,30 @@ function Bakimlar() {
 
     const bakimKaydet = async () => {
         if (!yeniUrun.productId) {
-            alert("Ürün seçiniz");
+            Swal.fire({
+                icon: "warning",
+                title: "Uyarı",
+                text: "Lütfen bir ürün seçiniz.",
+                confirmButtonColor: "#2563eb"
+            });
             return;
         }
         if (!yeniUrun.employeeId) {
-            alert("Personel seçiniz");
+            Swal.fire({
+                icon: "warning",
+                title: "Uyarı",
+                text: "Lütfen bir personel seçiniz.",
+                confirmButtonColor: "#2563eb"
+            });
             return;
         }
         if (!yeniUrun.maintenanceDate) {
-            alert("Tarih seçiniz");
+            Swal.fire({
+                icon: "warning",
+                title: "Uyarı",
+                text: "Lütfen bir tarih seçiniz.",
+                confirmButtonColor: "#2563eb"
+            });
             return;
         }
         try {
@@ -91,10 +109,23 @@ function Bakimlar() {
                 };
             }
             console.log("Gönderilen bakım =", yeniBakim);
+            
             if (duzenlemeModu) {
                 await bakimGuncelle(yeniUrun.id, yeniBakim);
+                Swal.fire({
+                    icon: "success",
+                    title: "Güncellendi",
+                    text: "Kayıt başarıyla güncellendi.",
+                    confirmButtonColor: "#2563eb"
+                });
             } else {
                 await bakimEkle(yeniBakim);
+                Swal.fire({
+                    icon: "success",
+                    title: "Başarılı",
+                    text: "Kayıt başarıyla oluşturuldu.",
+                    confirmButtonColor: "#2563eb"
+                });
             }
 
             setYeniUrun(temizFormState);
@@ -103,17 +134,43 @@ function Bakimlar() {
             verileriYukle();
         } catch (hata) {
             console.log(hata);
-            alert(JSON.stringify(hata.response?.data));
+            Swal.fire({
+                icon: "error",
+                title: "Hata",
+                text: hata.response?.data ? JSON.stringify(hata.response.data) : "İşlem gerçekleştirilemedi."
+            });
         }
     };
 
     const bakimiSil = async (id) => {
-        if (!window.confirm("Silinsin mi?")) return;
+        const sonuc = await Swal.fire({
+            title: "Emin misiniz?",
+            text: "Bu kayıt silinecektir.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Evet",
+            cancelButtonText: "İptal",
+            confirmButtonColor: "#dc3545"
+        });
+
+        if (!sonuc.isConfirmed) return;
+
         try {
             await bakimSil(id);
+            Swal.fire({
+                icon: "success",
+                title: "Silindi",
+                text: "Kayıt başarıyla silindi.",
+                confirmButtonColor: "#dc3545"
+            });
             verileriYukle();
         } catch (err) {
             console.log(err);
+            Swal.fire({
+                icon: "error",
+                title: "Hata",
+                text: "İşlem gerçekleştirilemedi."
+            });
         }
     };
 
@@ -170,6 +227,13 @@ function Bakimlar() {
                     />
                     <button
                         className="btn btn-success"
+                        onClick={bakimExcelIndir}
+                    >
+                        <i className="bi bi-file-earmark-excel me-2"></i>
+                        Excel'e Aktar
+                    </button>
+                    <button
+                        className="btn btn-primary"
                         onClick={() => {
                             setDuzenlemeModu(false);
                             setYeniUrun(temizFormState);
@@ -263,7 +327,6 @@ function Bakimlar() {
                             </td>
                         </tr>
                     ) : (
-
                         gecerliBakimlar.map((bakim, index) => {
                             const urun = urunler.find(u => u.id === bakim.productId) || {};
                             const personel = personeller.find(p => p.id === bakim.employeeId) || {};
@@ -498,6 +561,11 @@ function Bakimlar() {
                     </div>
                 </div>
             )}
+            <div className="text-center mt-4 mb-5">
+                <small className="text-muted">
+                    ACAR Bakım Takip Sistemi © 2026
+                </small>
+            </div>
         </div>
     );
 }

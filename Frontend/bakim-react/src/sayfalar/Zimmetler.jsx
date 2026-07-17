@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import { zimmetleriGetir, zimmetEkle, zimmetIadeEt } from "../services/zimmetServisi";
 import { personelleriGetir } from "../services/personelServisi";
 import { urunleriGetir, uygunUrunleriGetir } from "../services/urunServisi";
 import { useLocation } from "react-router-dom";
+
 
 function Zimmetler() {
     const [zimmetler, setZimmetler] = useState([]);
@@ -32,24 +34,61 @@ function Zimmetler() {
     }, []);
 
     const yukle = async () => {
-        const data = await zimmetleriGetir();
-        setZimmetler(data || []);
+        try {
+            const data = await zimmetleriGetir();
+            setZimmetler(data || []);
+        } catch (hata) {
+            console.error("Zimmetler yüklenirken hata oluştu:", hata);
+        }
     };
 
     // Sadece uygun/müsait olan ürünleri yükler
     const urunleriYukle = async () => {
-        const data = await uygunUrunleriGetir();
-        setUrunler(data || []);
+        try {
+            const data = await uygunUrunleriGetir();
+            setUrunler(data || []);
+        } catch (hata) {
+            console.error("Ürünler yüklenirken hata oluştu:", hata);
+        }
     };
 
     const personelleriYukle = async () => {
-        const data = await personelleriGetir();
-        setPersoneller(data || []);
+        try {
+            const data = await personelleriGetir();
+            setPersoneller(data || []);
+        } catch (hata) {
+            console.error("Personeller yüklenirken hata oluştu:", hata);
+        }
     };
 
     const kaydet = async () => {
+        if (!yeniZimmet.productId) {
+            Swal.fire({
+                icon: "warning",
+                title: "Uyarı",
+                text: "Lütfen bir ürün seçiniz.",
+                confirmButtonColor: "#2563eb"
+            });
+            return;
+        }
+        if (!yeniZimmet.employeeId) {
+            Swal.fire({
+                icon: "warning",
+                title: "Uyarı",
+                text: "Lütfen bir personel seçiniz.",
+                confirmButtonColor: "#2563eb"
+            });
+            return;
+        }
+
         try {
             await zimmetEkle(yeniZimmet);
+            Swal.fire({
+                icon: "success",
+                title: "Başarılı",
+                text: "Kayıt başarıyla oluşturuldu.",
+                confirmButtonColor: "#2563eb"
+            });
             setModalAcik(false);
             setYeniZimmet({
                 productId: "",
@@ -57,8 +96,47 @@ function Zimmetler() {
                 aciklama: ""
             });
             yukle();
+            urunleriYukle();
         } catch (hata) {
             console.error("Zimmet kaydedilirken hata oluştu:", hata);
+            Swal.fire({
+                icon: "error",
+                title: "Hata",
+                text: "İşlem gerçekleştirilemedi."
+            });
+        }
+    };
+
+    const iadeEtmeIslemi = async (id) => {
+        const sonuc = await Swal.fire({
+            title: "Emin misiniz?",
+            text: "Bu zimmet kaydı iade edilecektir.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Evet",
+            cancelButtonText: "İptal",
+            confirmButtonColor: "#dc3545"
+        });
+
+        if (!sonuc.isConfirmed) return;
+
+        try {
+            await zimmetIadeEt(id);
+            Swal.fire({
+                icon: "success",
+                title: "Silindi",
+                text: "Kayıt başarıyla silindi.",
+                confirmButtonColor: "#dc3545"
+            });
+            yukle();
+            urunleriYukle();
+        } catch (err) {
+            console.error("İade edilirken hata oluştu:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Hata",
+                text: "İşlem gerçekleştirilemedi."
+            });
         }
     };
 
@@ -105,14 +183,7 @@ function Zimmetler() {
                                 {z.aktifMi && (
                                     <button
                                         className="btn btn-danger btn-sm"
-                                        onClick={async () => {
-                                            if (!window.confirm("Ürün iade edilsin mi?"))
-                                                return;
-
-                                            await zimmetIadeEt(z.id);
-                                            yukle();
-                                            urunleriYukle();
-                                        }}
+                                        onClick={() => iadeEtmeIslemi(z.id)}
                                     >
                                         İade Et
                                     </button>
@@ -146,7 +217,7 @@ function Zimmetler() {
                             </div>
 
                             <div className="modal-body">
-                                <label className="fw-bold">Ürün</label>
+                                <label className="fw-bold mb-1">Ürün</label>
                                 <select
                                     className="form-select mb-3"
                                     value={yeniZimmet.productId}
@@ -165,7 +236,7 @@ function Zimmetler() {
                                     ))}
                                 </select>
 
-                                <label className="fw-bold">Personel</label>
+                                <label className="fw-bold mb-1">Personel</label>
                                 <select
                                     className="form-select mb-3"
                                     value={yeniZimmet.employeeId}
@@ -184,6 +255,7 @@ function Zimmetler() {
                                     ))}
                                 </select>
 
+                                <label className="fw-bold mb-1">Açıklama</label>
                                 <textarea
                                     className="form-control"
                                     rows="3"
@@ -216,6 +288,11 @@ function Zimmetler() {
                     </div>
                 </div>
             )}
+            <div className="text-center mt-4 mb-5">
+                <small className="text-muted">
+                    ACAR Bakım Takip Sistemi © 2026
+                </small>
+            </div>
         </div>
     );
 }

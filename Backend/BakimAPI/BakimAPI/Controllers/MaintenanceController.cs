@@ -2,7 +2,7 @@
 using BakimAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using ClosedXML.Excel;
 namespace BakimAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -197,6 +197,51 @@ namespace BakimAPI.Controllers
         private bool MaintenanceExists(int id)
         {
             return _context.Maintenances.Any(e => e.Id == id);
+        }
+        [HttpGet("excel")]
+        public async Task<IActionResult> ExportExcel()
+        {
+            var maintenances = await _context.Maintenances
+                .Include(x => x.Product)
+                .Include(x => x.Employee)
+                .OrderByDescending(x => x.MaintenanceDate)
+                .ToListAsync();
+
+            using var workbook = new XLWorkbook();
+
+            var ws = workbook.Worksheets.Add("Bakımlar");
+
+            ws.Cell(1, 1).Value = "Ürün";
+            ws.Cell(1, 2).Value = "Personel";
+            ws.Cell(1, 3).Value = "Bakım Tarihi";
+            ws.Cell(1, 4).Value = "Açıklama";
+            ws.Cell(1, 5).Value = "Durum";
+
+            int row = 2;
+
+            foreach (var item in maintenances)
+            {
+                ws.Cell(row, 1).Value = item.Product?.ProductName;
+                ws.Cell(row, 2).Value = $"{item.Employee?.FirstName} {item.Employee?.LastName}";
+                ws.Cell(row, 3).Value = item.MaintenanceDate.ToString("dd.MM.yyyy");
+                ws.Cell(row, 4).Value = item.Description;
+                ws.Cell(row, 5).Value = item.Status;
+
+                row++;
+            }
+
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+
+            workbook.SaveAs(stream);
+
+            stream.Position = 0;
+
+            return File(
+                stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "Bakimlar.xlsx");
         }
     }
 }

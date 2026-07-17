@@ -1,95 +1,144 @@
-.sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    width:260px;
-    height:100vh;
-
-    background:#ffffff;
-
-    border-right:1px solid #e8e8e8;
-
-    box-shadow:0 0 20px rgba(0,0,0,.08);
-
-    padding:25px;
-
-    z-index:999;
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #eff6ff;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --sidebar-border: #f1f5f9;
+  --transition-speed: 0.2s;
+  --border-radius-custom: 10px;
 }
 
-.logo{
+/* Sidebar Genel Konteyner - Fixed çakışması kaldırılmıştır */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  height: 100vh;
 
-    text-align:center;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  box-shadow: 2px 0 15px rgba(0,0,0,.05);
 
-    margin-bottom:35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 22px 16px;
+  margin-top: 20px;
 }
 
-.logo h3{
-
-    font-weight:700;
-
-    color:#2563eb;
-
-    margin-bottom:5px;
+/* Logo Bölümü - Logo ile ilk menü arası açıldı */
+.logo {
+  text-align: left;
+  padding-left: 8px;
+  margin-bottom: 35px; /* 35px yapıldı */
 }
 
-.logo p{
-
-    color:#777;
-
-    font-size:14px;
+.logo h4 {
+  font-weight: 800;
+  color: var(--primary-color);
+  letter-spacing: -0.5px;
+  font-size: 1.25rem;
 }
 
-.sidebar nav{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:12px;
+.logo small {
+  color: var(--text-muted);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
-.menu-link{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:15px;
-
-    text-decoration:none;
-
-    color:#444;
-
-    font-size:17px;
-
-    font-weight:500;
-
-    padding:14px 18px;
-
-    border-radius:14px;
-
-    transition:.25s;
+/* Navigasyon Link Listesi */
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;        /* 10px yapıldı */
+  margin-top: 20px; /* 20px yapıldı */
 }
 
-.menu-link:hover{
+/* Menü Linki Varsayılan Durumu */
+.menu-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 
-    background:#eaf3ff;
+  padding: 14px 18px;
 
-    color:#2563eb;
+  border-radius: 14px;
 
-    transform:translateX(5px);
+  font-size: 18px;
+  font-weight: 600;
+
+  transition: .25s;
+  text-decoration: none; /* Link alt çizgisini kaldırmak için eklenmiştir */
+  color: var(--text-dark);
 }
 
-.menu-link.active{
-
-    background:#2563eb;
-
-    color:white;
-
-    box-shadow:0 8px 20px rgba(37,99,235,.25);
+/* İkonların Hizası ve Boyutu */
+.menu-link i {
+  width: 24px;
+  text-align: center;
+  font-size: 22px;
+  transition: color var(--transition-speed) ease;
 }
 
-.menu-link span{
+/* Menü Linki Hover Durumu */
+.menu-link:hover {
+  transform: translateX(6px);
+  background: #eff6ff;
+  color: #2563eb !important;
+}
 
-    flex:1;
+.menu-link:hover i {
+  color: var(--primary-color) !important;
+}
+
+/* Menü Linki Aktif Durumu */
+.menu-link.active {
+  background: #2563eb !important;
+  color: white !important;
+  box-shadow: 0 10px 20px rgba(37,99,235,.20);
+}
+
+.menu-link.active i {
+  color: #ffffff !important;
+}
+
+/* Profil Kartı Düzenlemesi */
+.user-profile-card {
+  padding: 15px !important;
+  border-radius: 14px;
+  margin-top: 20px; /* Biraz yukarı alındı (20px yapıldı) */
+  border: 1px solid transparent;
+}
+
+.user-profile-card:hover {
+  border-color: #cbd5e1 !important;
+}
+
+/* Çıkış Butonu Hover Efekti */
+.sidebar .btn-outline-danger {
+  border-color: #fee2e2;
+  color: #ef4444;
+  background-color: #fff5f5;
+  transition: all var(--transition-speed) ease;
+  font-size: 13px;
+}
+
+.sidebar .btn-outline-danger:hover {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+/* Dikey taşmalar için kaydırma barı */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
 }

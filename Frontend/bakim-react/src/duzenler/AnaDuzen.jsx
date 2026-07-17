@@ -3,11 +3,25 @@ import Menu from "../bilesenler/Menu";
 
 function AnaDuzen() {
     return (
-        <div className="d-flex">
-
+        <div 
+            className="d-flex bg-light" 
+            style={{ 
+                height: "100vh", 
+                overflow: "hidden" 
+            }}
+        >
             <Menu />
 
-            <div className="container-fluid p-4">
+            <div
+                className="flex-grow-1"
+                style={{
+                    minWidth: 0,
+                    height: "100%",
+                    padding: "28px",
+                    overflowY: "auto",
+                    overflowX: "auto" 
+                }}
+            >
                 <Outlet />
             </div>
 

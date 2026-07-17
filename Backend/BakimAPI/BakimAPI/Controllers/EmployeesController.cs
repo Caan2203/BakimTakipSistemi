@@ -2,6 +2,7 @@
 using BakimAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ClosedXML.Excel;
 
 namespace BakimAPI.Controllers
 {
@@ -82,6 +83,45 @@ namespace BakimAPI.Controllers
                 return NotFound();
 
             return Ok(employee);
+        }
+        [HttpGet("excel")]
+        public async Task<IActionResult> ExportExcel()
+        {
+            var employees = await _context.Employees.ToListAsync();
+
+            using var workbook = new XLWorkbook();
+
+            var ws = workbook.Worksheets.Add("Personeller");
+
+            ws.Cell(1, 1).Value = "Ad";
+            ws.Cell(1, 2).Value = "Soyad";
+            ws.Cell(1, 3).Value = "Departman";
+            ws.Cell(1, 4).Value = "Telefon";
+            ws.Cell(1, 5).Value = "Mail";
+
+            int row = 2;
+
+            foreach (var item in employees)
+            {
+                ws.Cell(row, 1).Value = item.FirstName;
+                ws.Cell(row, 2).Value = item.LastName;
+                ws.Cell(row, 3).Value = item.Department;
+                ws.Cell(row, 4).Value = item.Phone;
+                ws.Cell(row, 5).Value = item.Email;
+
+                row++;
+            }
+
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+
+            workbook.SaveAs(stream);
+
+            return File(
+                stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "Personeller.xlsx");
         }
     }
 }

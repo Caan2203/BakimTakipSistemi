@@ -71,39 +71,52 @@ function GostergePaneli() {
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">Gösterge Paneli</h2>
+      {/* Gösterge Paneli Başlığı */}
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 className="fw-bold mb-0">
+            📊 Gösterge Paneli
+          </h2>
+          <small className="text-muted">
+            Bakım Takip Sistemi Genel Durum
+          </small>
+        </div>
+        <span className="badge bg-success fs-6">
+          Sistem Aktif
+        </span>
+      </div>
       
       {/* İstatistik Kartları */}
       <div className="row">
         <div className="col-md-3 mb-3">
-          <div className="card shadow h-100">
+          <div className="card shadow-lg border-0 h-100">
             <div className="card-body text-center">
-              <h5>Toplam Ürün</h5>
-              <h2>{dashboard.totalProducts}</h2>
+              <h5 className="fw-semibold">Toplam Ürün</h5>
+              <h2 className="fw-bold ">{dashboard.totalProducts}</h2>
             </div>
           </div>
         </div>
         <div className="col-md-3 mb-3">
-          <div className="card shadow h-100">
+          <div className="card shadow-lg border-0 h-100">
             <div className="card-body text-center">
-              <h5>Bakımdaki Ürün</h5>
-              <h2>{dashboard.productsInMaintenance}</h2>
+              <h5 className="fw-semibold">Bakımdaki Ürün</h5>
+              <h2 className="fw-bold">{dashboard.productsInMaintenance}</h2>
             </div>
           </div>
         </div>
         <div className="col-md-3 mb-3">
-          <div className="card shadow h-100">
+          <div className="card shadow-lg border-0 h-100">
             <div className="card-body text-center">
-              <h5>Personel</h5>
-              <h2>{dashboard.totalEmployees}</h2>
+              <h5 className="fw-semibold">Personel</h5>
+              <h2 className="fw-bold">{dashboard.totalEmployees}</h2>
             </div>
           </div>
         </div>
         <div className="col-md-3 mb-3">
-          <div className="card shadow h-100">
+          <div className="card shadow-lg border-0 h-100">
             <div className="card-body text-center">
-              <h5>Toplam Bakım</h5>
-              <h2>{dashboard.totalMaintenances}</h2>
+              <h5 className="fw-semibold">Toplam Bakım</h5>
+              <h2 className="fw-bold">{dashboard.totalMaintenances}</h2>
             </div>
           </div>
         </div>
@@ -112,7 +125,7 @@ function GostergePaneli() {
       {/* Durum Kartları */}
       <div className="row">
         <div className="col-md-6 mb-3">
-          <div className="card border-success shadow h-100">
+          <div className="card border-success shadow-lg h-100">
             <div className="card-header bg-success text-white">
               Yaklaşan Bakımlar
             </div>
@@ -122,7 +135,7 @@ function GostergePaneli() {
           </div>
         </div>
         <div className="col-md-6 mb-3">
-          <div className="card border-danger shadow h-100">
+          <div className="card border-danger shadow-lg h-100">
             <div className="card-header bg-danger text-white">
               Geciken Bakımlar
             </div>
@@ -133,10 +146,9 @@ function GostergePaneli() {
         </div>
       </div>
 
-      {/* Grafik */}
-      <div className="card shadow">
+      <div className="card shadow-lg border-0">
         <div className="card-header">
-          <h5 className="mb-0">Son 6 Ay Bakım Grafiği</h5>
+          <h5 className="fw-semibold mb-0">Son 6 Ay Bakım Grafiği</h5>
         </div>
         <div className="card-body">
           <Line data={grafikVerisi} />
@@ -146,9 +158,9 @@ function GostergePaneli() {
       {/* Yaklaşan ve Geciken Ürünler Listesi */}
       <div className="row mt-4">
         <div className="col-md-6 mb-3">
-          <div className="card shadow border-success h-100">
+          <div className="card shadow-lg border-success h-100">
             <div className="card-header bg-success text-white">
-              <h5 className="mb-0">Yaklaşan Bakımı Olan Ürünler</h5>
+              <h5 className="fw-semibold mb-0">Yaklaşan Bakımı Olan Ürünler</h5>
             </div>
             <div className="card-body">
               {upcomingProducts.length === 0 ? (
@@ -172,9 +184,9 @@ function GostergePaneli() {
         </div>
         
         <div className="col-md-6 mb-3">
-          <div className="card shadow border-danger h-100">
+          <div className="card shadow-lg border-danger h-100">
             <div className="card-header bg-danger text-white">
-              <h5 className="mb-0">Bakımı Geciken Ürünler</h5>
+              <h5 className="fw-semibold mb-0">Bakımı Geciken Ürünler</h5>
             </div>
             <div className="card-body">
               {overdueProducts.length === 0 ? (
@@ -196,9 +208,9 @@ function GostergePaneli() {
       </div>
 
       {/* Son Yapılan Bakımlar Tablosu */}
-      <div className="card shadow mt-4">
+      <div className="card shadow-lg border-0 mt-4">
         <div className="card-header">
-          <h5 className="mb-0">Son Yapılan Bakımlar</h5>
+          <h5 className="fw-semibold mb-0">Son Yapılan Bakımlar</h5>
         </div>
         <div className="card-body">
           <table className="table table-striped table-hover align-middle">
@@ -238,10 +250,10 @@ function GostergePaneli() {
         </div>
       </div>
 
-      {/* Son Ürün Hareketleri Kartı (Tablonun tamamen dışına, doğru hiyerarşiye alındı) */}
-      <div className="card shadow mt-4">
+      {/* Son Ürün Hareketleri Kartı */}
+      <div className="card shadow-lg border-0 mt-4">
         <div className="card-header bg-dark text-white">
-          <h5 className="mb-0">Son Ürün Hareketleri</h5>
+          <h5 className="fw-semibold mb-0">Son Ürün Hareketleri</h5>
         </div>
         <div className="card-body">
           <table className="table table-hover">
@@ -277,6 +289,13 @@ function GostergePaneli() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Sayfa Sonu Alt Bilgi */}
+      <div className="text-center mt-4 mb-5">
+        <small className="text-muted">
+          ACAR Bakım Takip Sistemi © 2026
+        </small>
       </div>
 
     </div>

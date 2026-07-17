@@ -21,3 +21,23 @@ export const personelDetayiGetir = async (id) => {
     const response = await api.get(`/Employees/${id}/detail`);
     return response.data;
 };
+export const personelExcelIndir = async () => {
+
+    const response = await api.get("/Employees/excel", {
+        responseType: "blob"
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    const link = document.createElement("a");
+
+    link.href = url;
+
+    link.download = "Personeller.xlsx";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+};

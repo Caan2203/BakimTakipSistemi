@@ -16,6 +16,7 @@ import Zimmetler from "./sayfalar/Zimmetler";
 import UrunGecmisi from "./sayfalar/UrunGecmisi";
 import PersonelDetay from "./sayfalar/PersonelDetay";
 import QRUrunDetay from "./sayfalar/QRUrunDetay";
+import { Toaster } from "react-hot-toast";
 
 function App() {
     return (

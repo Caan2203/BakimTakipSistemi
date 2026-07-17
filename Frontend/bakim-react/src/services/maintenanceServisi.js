@@ -17,3 +17,23 @@ export const bakimGuncelle = async (id, bakim) => {
 export const bakimSil = async (id) => {
     await api.delete(`/Maintenance/${id}`);
 };
+export const bakimExcelIndir = async () => {
+
+    const response = await api.get("/Maintenance/excel", {
+        responseType: "blob"
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    const link = document.createElement("a");
+
+    link.href = url;
+
+    link.download = "Bakimlar.xlsx";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+};

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
 using System.Drawing;
+using ClosedXML.Excel;
 
 namespace BakimAPI.Controllers
 {
@@ -290,6 +291,51 @@ namespace BakimAPI.Controllers
         private bool ProductExists(int id)
         {
             return _context.Products.Any(e => e.Id == id);
+        }
+        [HttpGet("excel")]
+        public async Task<IActionResult> ExportExcel()
+        {
+            var products = await _context.Products.ToListAsync();
+
+            using var workbook = new XLWorkbook();
+
+            var ws = workbook.Worksheets.Add("Ürünler");
+
+            ws.Cell(1, 1).Value = "Ürün Kodu";
+            ws.Cell(1, 2).Value = "Ürün Adı";
+            ws.Cell(1, 3).Value = "Marka";
+            ws.Cell(1, 4).Value = "Model";
+            ws.Cell(1, 5).Value = "Kategori";
+            ws.Cell(1, 6).Value = "Konum";
+            ws.Cell(1, 7).Value = "Bakım Durumu";
+
+            int row = 2;
+
+            foreach (var item in products)
+            {
+                ws.Cell(row, 1).Value = item.ProductCode;
+                ws.Cell(row, 2).Value = item.ProductName;
+                ws.Cell(row, 3).Value = item.Brand;
+                ws.Cell(row, 4).Value = item.Model;
+                ws.Cell(row, 5).Value = item.Category;
+                ws.Cell(row, 6).Value = item.Location;
+                ws.Cell(row, 7).Value = item.IsInMaintenance
+                    ? "Bakımda"
+                    : "Kullanımda";
+
+                row++;
+            }
+
+            using var stream = new MemoryStream();
+
+            workbook.SaveAs(stream);
+
+            stream.Position = 0;
+
+            return File(
+                stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "Urunler.xlsx");
         }
     }
 }

@@ -43,5 +43,7 @@ export const urunHareketleriniGetir = async (id) => {
     const response = await api.get(`/ProductHistory/${id}`);
 
     return response.data;
-
+};
+export const excelIndir = () => {
+    window.open("https://localhost:7020/api/Products/excel", "_blank");
 };
