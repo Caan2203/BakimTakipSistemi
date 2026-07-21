@@ -2,22 +2,15 @@ import { NavLink } from "react-router-dom";
 import "./Menu.css";
 
 function Menu() {
-    // Kullanıcı bilgilerini bileşen içinde localStorage'dan alıyoruz
     const ad = localStorage.getItem("ad") || "Kullanıcı";
     const soyad = localStorage.getItem("soyad") || "";
     const rol = localStorage.getItem("rol") || "Personel";
-
-    // Çıkış yap fonksiyonu
     const cikisYap = () => {
         localStorage.clear();
         window.location.href = "/giris";
     };
-
-    // Aktif olan menü elemanına özel stil sınıfı veren fonksiyon
     const menuClass = ({ isActive }) =>
         isActive ? "menu-link active" : "menu-link";
-
-    // Role göre badge rengini belirleme
     const getRolBadgeClass = (userRol) => {
         const r = userRol.toLowerCase();
         if (r.includes("yönetici") || r.includes("admin")) return "bg-danger-subtle text-danger";
@@ -27,8 +20,6 @@ function Menu() {
 
     return (
         <aside className="sidebar">
-            
-            {/* Logo / Başlık Alanı */}
             <div>
                 <div className="logo">
                     <h4 className="fw-bold text-primary mb-1 d-flex align-items-center gap-2">
@@ -38,8 +29,6 @@ function Menu() {
                         YÖNETİM PANELİ
                     </small>
                 </div>
-
-                {/* Menü Linkleri */}
                 <nav>
                     <NavLink to="/gosterge-paneli" className={menuClass}>
                         <i className="bi bi-speedometer2"></i>
@@ -72,12 +61,8 @@ function Menu() {
                     </NavLink>
                 </nav>
             </div>
-
-            {/* Profil ve Çıkış Bölümü (En Alt) */}
             <div>
                 <hr className="text-muted my-3" />
-
-                {/* Kullanıcı Profil Alanı */}
                 <div className="user-profile-card d-flex align-items-center gap-2 p-2 rounded-3 mb-3">
                     <div className="profile-icon bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style={{ width: "40px", height: "40px", flexShrink: 0 }}>
                         <i className="bi bi-person-circle text-primary fs-4"></i>
@@ -91,8 +76,6 @@ function Menu() {
                         </span>
                     </div>
                 </div>
-
-                {/* Çıkış Yap Butonu */}
                 <button
                     onClick={cikisYap}
                     className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2 rounded-2"
@@ -105,5 +88,4 @@ function Menu() {
         </aside>
     );
 }
-
 export default Menu;

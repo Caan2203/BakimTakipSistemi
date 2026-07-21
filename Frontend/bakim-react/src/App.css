@@ -55,8 +55,6 @@ body{
     outline-offset: 2px;
   }
 }
-
-/* 3D Görsel Alanı (Hero) */
 .hero {
   position: relative;
   width: 100%;
@@ -99,8 +97,6 @@ body{
     filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.08));
   }
 }
-
-/* Merkez Konteyner */
 #center {
   display: flex;
   flex-direction: column;
@@ -115,8 +111,6 @@ body{
     gap: 16px;
   }
 }
-
-/* Sonraki Adımlar Bölümü */
 #next-steps {
   display: flex;
   border-top: 1px solid var(--border);
@@ -138,8 +132,6 @@ body{
     height: 24px;
     color: var(--accent);
   }
-
-  /* Sosyal Linkler Listesi */
   ul {
     list-style: none;
     padding: 0;
@@ -201,7 +193,6 @@ body{
   }
 }
 
-/* Sol Döküman Bölmesi Sınırı */
 #docs {
   border-right: 1px solid var(--border);
 
@@ -210,8 +201,6 @@ body{
     border-bottom: 1px solid var(--border);
   }
 }
-
-/* Boşluk Düzenleyici (Spacer) */
 #spacer {
   height: 80px;
   border-top: 1px solid var(--border);
@@ -220,8 +209,6 @@ body{
     height: 40px;
   }
 }
-
-/* Süsleme Tırnakları */
 .ticks {
   position: relative;
   width: 100%;

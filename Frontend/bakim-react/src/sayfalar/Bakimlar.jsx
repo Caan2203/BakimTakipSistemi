@@ -215,7 +215,7 @@ function Bakimlar() {
     return (
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Bakım Yönetimi</h2>
+                <h2>🛠️Bakım Yönetimi</h2>
                 <div className="d-flex gap-2">
                     <input
                         type="text"

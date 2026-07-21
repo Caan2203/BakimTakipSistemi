@@ -27,6 +27,7 @@ ChartJS.register(
 function GostergePaneli() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     dashboardYukle();
@@ -68,25 +69,51 @@ function GostergePaneli() {
 
   const upcomingProducts = dashboard.upcomingProducts || [];
   const overdueProducts = dashboard.overdueProducts || [];
+  const notifications = dashboard.notifications || [];
 
   return (
     <div className="container mt-4">
-      {/* Gösterge Paneli Başlığı */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-4 position-relative">
         <div>
-          <h2 className="fw-bold mb-0">
-            📊 Gösterge Paneli
-          </h2>
+          <h2 className="fw-bold mb-1">📊Gösterge Paneli</h2>
           <small className="text-muted">
-            Bakım Takip Sistemi Genel Durum
+            Bakım Takip Sistemine Hoş Geldiniz
           </small>
         </div>
-        <span className="badge bg-success fs-6">
-          Sistem Aktif
-        </span>
+
+        
+        {showNotifications && (
+          <div
+            className="card shadow-sm border-0"
+            style={{
+              position: "absolute",
+              top: "60px",
+              right: "0px",
+              width: "320px",
+              zIndex: 999
+            }}
+          >
+            <div className="card-header bg-white fw-bold">
+              Bildirimler
+            </div>
+
+            <div className="list-group list-group-flush">
+              {notifications.length === 0 ? (
+                <div className="dropdown-item text-muted text-center py-2">
+                  Bildirim bulunmuyor.
+                </div>
+              ) : (
+                notifications.map((item, index) => (
+                  <div key={index} className="dropdown-item">
+                    {item.icon} {item.message}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
       </div>
-      
-      {/* İstatistik Kartları */}
+
       <div className="row">
         <div className="col-md-3 mb-3">
           <div className="card shadow-lg border-0 h-100">
@@ -121,8 +148,6 @@ function GostergePaneli() {
           </div>
         </div>
       </div>
-
-      {/* Durum Kartları */}
       <div className="row">
         <div className="col-md-6 mb-3">
           <div className="card border-success shadow-lg h-100">
@@ -154,8 +179,6 @@ function GostergePaneli() {
           <Line data={grafikVerisi} />
         </div>
       </div>
-
-      {/* Yaklaşan ve Geciken Ürünler Listesi */}
       <div className="row mt-4">
         <div className="col-md-6 mb-3">
           <div className="card shadow-lg border-success h-100">
@@ -182,7 +205,7 @@ function GostergePaneli() {
             </div>
           </div>
         </div>
-        
+
         <div className="col-md-6 mb-3">
           <div className="card shadow-lg border-danger h-100">
             <div className="card-header bg-danger text-white">
@@ -206,8 +229,6 @@ function GostergePaneli() {
           </div>
         </div>
       </div>
-
-      {/* Son Yapılan Bakımlar Tablosu */}
       <div className="card shadow-lg border-0 mt-4">
         <div className="card-header">
           <h5 className="fw-semibold mb-0">Son Yapılan Bakımlar</h5>
@@ -249,8 +270,6 @@ function GostergePaneli() {
           </table>
         </div>
       </div>
-
-      {/* Son Ürün Hareketleri Kartı */}
       <div className="card shadow-lg border-0 mt-4">
         <div className="card-header bg-dark text-white">
           <h5 className="fw-semibold mb-0">Son Ürün Hareketleri</h5>
@@ -290,14 +309,11 @@ function GostergePaneli() {
           </table>
         </div>
       </div>
-
-      {/* Sayfa Sonu Alt Bilgi */}
       <div className="text-center mt-4 mb-5">
         <small className="text-muted">
           ACAR Bakım Takip Sistemi © 2026
         </small>
       </div>
-
     </div>
   );
 }

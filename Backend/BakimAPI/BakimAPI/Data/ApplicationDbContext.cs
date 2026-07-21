@@ -21,5 +21,7 @@ namespace BakimAPI.Data
         public DbSet<Zimmet> Zimmetler { get; set; }
 
         public DbSet<ProductHistory> ProductHistories { get; set; }
+
+        public DbSet<Notification> Notifications { get; set; }
     }
 }

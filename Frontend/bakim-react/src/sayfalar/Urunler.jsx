@@ -40,7 +40,6 @@ function Urunler() {
     };
 
     const urunKaydet = async () => {
-        // Form alanlarının doluluk kontrolü
         if (!yeniUrun.productName) {
             Swal.fire({
                 icon: "warning",
@@ -123,8 +122,6 @@ function Urunler() {
             });
         }
     };
-
-    // Filtreleme mantığı: Arama metni ve Kategori filtresi birlikte değerlendirilir
     const filtrelenmisUrunler = urunler.filter((urun) => {
         const arama = aramaMetni.toLowerCase();
         
@@ -133,16 +130,12 @@ function Urunler() {
         const kodEslesti = urun.productCode?.toLowerCase().includes(arama);
         const markaEslesti = urun.brand?.toLowerCase().includes(arama);
         const modelEslesti = urun.model?.toLowerCase().includes(arama);
-
-        // Kategori eşleşme kontrolü
         const kategoriEslesti = 
             kategoriFiltre === "" || 
             urun.category === kategoriFiltre;
 
         return (isimEslesti || kodEslesti || markaEslesti || modelEslesti) && kategoriEslesti;
     });
-
-    // Tablo hücreleri için padding kuralı
     const hucreStili = { padding: "18px" };
 
     return (
@@ -156,14 +149,13 @@ function Urunler() {
             >
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h2 className="fw-bold mb-2">
+                        <h2 className="mb-2">
                             📦 Ürünler
                         </h2>
                         <p className="text-muted mb-0">
                             Tüm ürünleri görüntüleyebilir, düzenleyebilir ve bakım işlemlerini yönetebilirsiniz.
                         </p>
                     </div>
-                    {/* Excel ve Yeni Ürün Buton Grubu */}
                     <div className="d-flex gap-2">
                         <button
                             className="btn btn-success d-flex align-items-center"
@@ -195,7 +187,6 @@ function Urunler() {
                 <div className="card shadow-sm border-0 mb-4">
                     <div className="card-body">
                         <div className="row align-items-center">
-                            {/* Arama Kutusu */}
                             <div className="col-md-6">
                                 <input
                                     type="text"
@@ -205,7 +196,6 @@ function Urunler() {
                                     onChange={(e) => setAramaMetni(e.target.value)}
                                 />
                             </div>
-                            {/* Kategori Seçici Filtresi */}
                             <div className="col-md-3">
                                 <select
                                     className="form-select form-select-lg"
@@ -220,7 +210,6 @@ function Urunler() {
                                     <option>Sunucu</option>
                                 </select>
                             </div>
-                            {/* Toplam Ürün Bilgisi */}
                             <div className="col-md-3 text-end">
                                 <span className="badge bg-primary p-3 fs-6">
                                     Toplam Ürün : {urunler.length}

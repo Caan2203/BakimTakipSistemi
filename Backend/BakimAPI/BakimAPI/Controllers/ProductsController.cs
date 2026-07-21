@@ -20,7 +20,7 @@ namespace BakimAPI.Controllers
         }
 
         [HttpGet("qr/{qrCode}")]
-        public async Task<ActionResult<Product>> GetProductByQr(string qrCode)
+        public async Task<ActionResult> GetProductByQr(string qrCode)
         {
             var product = await _context.Products
                 .Include(p => p.Maintenances)
@@ -37,9 +37,10 @@ namespace BakimAPI.Controllers
                 .OrderByDescending(z => z.VerilisTarihi)
                 .FirstOrDefault();
 
-            var result = new
+            return Ok(new
             {
                 product.Id,
+                product.QrCode,
                 product.ProductName,
                 product.ProductCode,
                 product.Brand,
@@ -53,7 +54,7 @@ namespace BakimAPI.Controllers
                 CurrentAssignment = aktifZimmet == null ? null : new
                 {
                     Employee = $"{aktifZimmet.Employee?.FirstName} {aktifZimmet.Employee?.LastName}",
-                    aktifZimmet.Employee?.Department,
+                    Department = aktifZimmet.Employee?.Department,
                     aktifZimmet.VerilisTarihi
                 },
 
@@ -62,16 +63,15 @@ namespace BakimAPI.Controllers
                     .Take(5)
                     .Select(x => new
                     {
+                        x.Id,
                         x.MaintenanceDate,
                         x.Status,
                         x.Description,
-                        Employee = x.Employee != null
-                            ? $"{x.Employee.FirstName} {x.Employee.LastName}"
-                            : ""
+                        Employee = x.Employee == null
+                            ? ""
+                            : $"{x.Employee.FirstName} {x.Employee.LastName}"
                     })
-            };
-
-            return Ok(result);
+            });
         }
 
         [HttpGet]
@@ -114,7 +114,14 @@ namespace BakimAPI.Controllers
                 product.QrCode = Guid.NewGuid().ToString();
                 product.LastMaintenanceDate = DateTime.Today;
                 product.NextMaintenanceDate = DateTime.Today.AddDays(product.MaintenancePeriodDay);
-
+                if (product.MaintenancePeriodDay <= 0)
+                {
+                    product.MaintenancePeriodDay = 180;
+                }
+                if (product.MaintenancePeriodDay <= 0)
+                {
+                    product.MaintenancePeriodDay = 180;
+                }
                 _context.Products.Add(product);
                 await _context.SaveChangesAsync();
 

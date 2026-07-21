@@ -41,8 +41,7 @@ function Zimmetler() {
             console.error("Zimmetler yüklenirken hata oluştu:", hata);
         }
     };
-
-    // Sadece uygun/müsait olan ürünleri yükler
+    
     const urunleriYukle = async () => {
         try {
             const data = await uygunUrunleriGetir();

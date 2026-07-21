@@ -68,15 +68,8 @@ textarea{
     font-family:inherit;
     outline:none;
 }
-
-/* ===========================
-   IMAGES
-=========================== */
-
 img{
-    max-width:0%}/* =====================================
-   TABLO YATAY SCROLL
-===================================== */
+    max-width:0%}
 
 .table-responsive-custom{
     width:100%;
@@ -88,8 +81,6 @@ img{
 .table-responsive-custom table{
     min-width:1450px;
 }
-
-/* Scrollbar */
 
 .table-responsive-custom::-webkit-scrollbar{
     height:10px;

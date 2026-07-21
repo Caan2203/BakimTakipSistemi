@@ -24,8 +24,6 @@ function PersonelDetay() {
                 </div>
             </div>
         );
-
-    // Aktif ve geçmiş zimmetleri süzüyoruz
     const aktifZimmetler = personel.zimmetler?.filter(z => z.aktifMi) || [];
     const gecmisZimmetler = personel.zimmetler?.filter(z => !z.aktifMi) || [];
 
@@ -37,11 +35,7 @@ function PersonelDetay() {
                 <h2>👤 Personel Detay Profili</h2>
             </div>
             <hr />
-
-            {/* Üst Bölüm: Personel Bilgileri & Aktif Zimmetler */}
             <div className="row mb-4">
-                
-                {/* Sol Sütun: Personel Kartı */}
                 <div className="col-lg-5 mb-4 mb-lg-0">
                     <div className="card shadow-sm border-0 h-100">
                         <div className="card-header bg-primary text-white py-3">
@@ -77,8 +71,6 @@ function PersonelDetay() {
                         </div>
                     </div>
                 </div>
-
-                {/* Sağ Sütun: Aktif Zimmetli Ürünler Listesi */}
                 <div className="col-lg-7">
                     <div className="card shadow-sm border-0 h-100">
                         <div className="card-header bg-success text-white py-3">
@@ -111,8 +103,6 @@ function PersonelDetay() {
                 </div>
 
             </div>
-
-            {/* Alt Bölüm: Geçmiş Zimmet Tablosu */}
             <div className="card shadow-sm border-0 mb-4">
                 <div className="card-header bg-secondary text-white py-3">
                     <h5 className="mb-0">📋 Zimmet Geçmişi</h5>

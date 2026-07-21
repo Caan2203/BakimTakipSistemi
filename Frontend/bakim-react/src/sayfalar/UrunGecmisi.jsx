@@ -27,8 +27,6 @@ function UrunGecmisi() {
                 </div>
             </div>
         );
-
-    // Backend'den gelen currentAssignment (veya CurrentAssignment) nesnesini kontrol et, yoksa diziden bul.
     const aktifZimmet = urun.currentAssignment || urun.CurrentAssignment || urun.zimmetler?.find(x => x.aktifMi);
 
     const toplamBakim = urun.maintenances?.length || 0;

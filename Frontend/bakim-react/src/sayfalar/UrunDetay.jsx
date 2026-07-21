@@ -6,6 +6,7 @@ import { urunGecmisiGetir } from "../servisler/urunServisi";
 function UrunDetay() {
     const { qrCode } = useParams();
 
+console.log("QR PARAMETRESİ:", qrCode);
     const [urun, setUrun] = useState(null);
     const [gecmis, setGecmis] = useState([]);
     const [zimmetGecmisi, setZimmetGecmisi] = useState([]);
@@ -81,8 +82,6 @@ function UrunDetay() {
                             </div>
                         </div>
                     )}
-
-                    {/* QR Kod Bölümü */}
                     <div className="text-center mt-4 border-top pt-3">
                         <h5>QR Kod</h5>
                         <img
@@ -94,8 +93,6 @@ function UrunDetay() {
                     </div>
                 </div>
             </div>
-
-            {/* Bakım Geçmişi Tablosu */}
             <div className="card shadow-sm mt-4">
                 <div className="card-header bg-secondary text-white">
                     <h5 className="mb-0">Bakım Geçmişi</h5>
@@ -114,8 +111,8 @@ function UrunDetay() {
                                 </tr>
                             </thead>
                             <tbody>
-    {urun.maintenances.map((bakim) => (
-        <tr key={bakim.id}>
+    {urun.maintenances.map((bakim, index) => (
+    <tr key={index}>
             <td>
                 {bakim.maintenanceDate
                     ? new Date(bakim.maintenanceDate).toLocaleDateString("tr-TR")
@@ -148,8 +145,6 @@ function UrunDetay() {
                     )}
                 </div>
             </div>
-
-            {/* Zimmet Geçmişi Tablosu */}
             <div className="card shadow-sm mt-4">
                 <div className="card-header bg-info text-white">
                     <h5 className="mb-0">Zimmet Geçmişi</h5>
@@ -199,8 +194,6 @@ function UrunDetay() {
                     )}
                 </div>
             </div>
-
-            {/* İşlem Geçmişi Kartı */}
             <div className="card shadow-sm mt-4">
                 <div className="card-header bg-dark text-white">
                     <h5 className="mb-0">

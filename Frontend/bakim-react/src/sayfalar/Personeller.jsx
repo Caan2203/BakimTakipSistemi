@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { personelExcelIndir } from "../services/personelServisi";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
 import {
     personelleriGetir,
     personelEkle,
@@ -110,8 +109,6 @@ function Personeller() {
             });
         }
     };
-
-    // Personel listesini isme, soyisme ve departmana göre filtreleyen mantık
     const filtreliPersoneller = personeller.filter(x =>
         x.firstName?.toLowerCase().includes(arama.toLowerCase()) ||
         x.lastName?.toLowerCase().includes(arama.toLowerCase()) ||
@@ -122,7 +119,7 @@ function Personeller() {
         <div className="container-fluid px-0">
             <div className="mt-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Personel Yönetimi</h2>
+                    <h2>👤Personel Yönetimi</h2>
                     {/* Buton Grubu */}
                     <div className="d-flex gap-2">
                         <button
@@ -150,8 +147,6 @@ function Personeller() {
                         </button>
                     </div>
                 </div>
-
-                {/* Arama Input Alanı */}
                 <div className="mb-3">
                     <input
                         type="text"

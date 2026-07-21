@@ -55,8 +55,6 @@ namespace BakimAPI.Controllers
 
                 if (product == null)
                     return BadRequest("Ürün bulunamadı.");
-
-                // employees nesnesini burada tek bir kez çekerek aşağıdaki null kontrolünü ve loglamayı güvenli hale getirdik.
                 var employees = await _context.Employees.FindAsync(maintenance.EmployeeId);
 
                 if (employees == null)
@@ -117,8 +115,6 @@ namespace BakimAPI.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-
-                // Güncelleme işlemi bittikten hemen sonra log ekleyip tekrar kaydediyoruz.
                 _context.ProductHistories.Add(new ProductHistory
                 {
                     ProductId = maintenance.ProductId,
@@ -150,8 +146,6 @@ namespace BakimAPI.Controllers
 
             if (maintenance == null)
                 return NotFound();
-
-            // Silme işleminden hemen önce log atıp ardından siliyoruz.
             _context.ProductHistories.Add(new ProductHistory
             {
                 ProductId = maintenance.ProductId,

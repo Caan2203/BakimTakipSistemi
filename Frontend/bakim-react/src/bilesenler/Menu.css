@@ -8,8 +8,6 @@
   --transition-speed: 0.2s;
   --border-radius-custom: 10px;
 }
-
-/* Sidebar Genel Konteyner - Fixed çakışması kaldırılmıştır */
 .sidebar {
   width: 220px;
   min-width: 220px;
@@ -27,12 +25,10 @@
   padding: 22px 16px;
   margin-top: 20px;
 }
-
-/* Logo Bölümü - Logo ile ilk menü arası açıldı */
 .logo {
   text-align: left;
   padding-left: 8px;
-  margin-bottom: 35px; /* 35px yapıldı */
+  margin-bottom: 35px;
 }
 
 .logo h4 {
@@ -48,16 +44,12 @@
   letter-spacing: 1px;
   text-transform: uppercase;
 }
-
-/* Navigasyon Link Listesi */
 .sidebar nav {
   display: flex;
   flex-direction: column;
-  gap: 10px;        /* 10px yapıldı */
-  margin-top: 20px; /* 20px yapıldı */
+  gap: 10px;
+  margin-top: 20px;
 }
-
-/* Menü Linki Varsayılan Durumu */
 .menu-link {
   display: flex;
   align-items: center;
@@ -71,11 +63,9 @@
   font-weight: 600;
 
   transition: .25s;
-  text-decoration: none; /* Link alt çizgisini kaldırmak için eklenmiştir */
+  text-decoration: none;
   color: var(--text-dark);
 }
-
-/* İkonların Hizası ve Boyutu */
 .menu-link i {
   width: 24px;
   text-align: center;
@@ -83,7 +73,6 @@
   transition: color var(--transition-speed) ease;
 }
 
-/* Menü Linki Hover Durumu */
 .menu-link:hover {
   transform: translateX(6px);
   background: #eff6ff;
@@ -93,8 +82,6 @@
 .menu-link:hover i {
   color: var(--primary-color) !important;
 }
-
-/* Menü Linki Aktif Durumu */
 .menu-link.active {
   background: #2563eb !important;
   color: white !important;
@@ -104,12 +91,10 @@
 .menu-link.active i {
   color: #ffffff !important;
 }
-
-/* Profil Kartı Düzenlemesi */
 .user-profile-card {
   padding: 15px !important;
   border-radius: 14px;
-  margin-top: 20px; /* Biraz yukarı alındı (20px yapıldı) */
+  margin-top: 20px;
   border: 1px solid transparent;
 }
 
@@ -117,7 +102,6 @@
   border-color: #cbd5e1 !important;
 }
 
-/* Çıkış Butonu Hover Efekti */
 .sidebar .btn-outline-danger {
   border-color: #fee2e2;
   color: #ef4444;
@@ -132,8 +116,6 @@
   border-color: #ef4444 !important;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
-
-/* Dikey taşmalar için kaydırma barı */
 .sidebar::-webkit-scrollbar {
   width: 4px;
 }
@@ -141,4 +123,123 @@
 .sidebar::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 10px;
+}
+.profile-card{
+
+padding:25px;
+
+background:white;
+
+border-radius:22px;
+
+box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+text-align:center;
+
+margin:15px;
+
+transition:.30s;
+
+}
+
+.profile-card:hover{
+
+transform:translateY(-4px);
+
+box-shadow:0 18px 45px rgba(0,0,0,.15);
+
+}
+
+.profile-avatar{
+
+width:90px;
+
+height:90px;
+
+margin:auto;
+
+border-radius:50%;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:34px;
+
+font-weight:bold;
+
+color:white;
+
+background:linear-gradient(135deg,#2563eb,#06b6d4);
+
+box-shadow:0 10px 25px rgba(37,99,235,.35);
+
+}
+
+.profile-info{
+
+margin-top:20px;
+
+display:flex;
+
+flex-direction:column;
+
+gap:15px;
+
+}
+
+.info-item{
+
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+padding:14px;
+
+border-radius:15px;
+
+background:#f8fafc;
+
+transition:.25s;
+
+}
+
+.info-item:hover{
+
+background:#eef5ff;
+
+transform:translateX(5px);
+
+}
+
+.info-item i{
+
+font-size:24px;
+
+color:#2563eb;
+
+width:40px;
+
+}
+
+.info-item small{
+
+display:block;
+
+color:#6b7280;
+
+font-size:12px;
+
+}
+
+.info-item strong{
+
+font-size:19px;
+
+display:block;
+
 }

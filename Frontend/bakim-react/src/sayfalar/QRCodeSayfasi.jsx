@@ -20,8 +20,6 @@ function QRCodeSayfasi() {
 
     const qrYazdir = (urun) => {
         const pencere = window.open("", "_blank", "width=500,height=700");
-        
-        // Dom üzerindeki ilgili QR elementinin SVG kodunu çekerek yazdırma sayfasına birebir aktarıyoruz
         const qrSvgElement = document.getElementById(`qr-svg-${urun.id}`);
         const qrSvgHtml = qrSvgElement ? qrSvgElement.outerHTML : "";
 
@@ -95,7 +93,7 @@ function QRCodeSayfasi() {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4">Ürün QR Kodları</h2>
+            <h2 className="mb-4">🔳Ürün QR Kodları</h2>
 
             <div className="row">
                 {urunler.map((urun) => (
