@@ -17,5 +17,9 @@
         public string Rol { get; set; } = "Personel";
 
         public DateTime OlusturmaTarihi { get; set; } = DateTime.Now;
+
+        public DateTime? LastLogin { get; set; }
+
+        public DateTime? PasswordChangedDate { get; set; }
     }
 }

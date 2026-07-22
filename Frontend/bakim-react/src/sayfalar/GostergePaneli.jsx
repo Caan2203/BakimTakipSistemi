@@ -75,13 +75,14 @@ function GostergePaneli() {
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4 position-relative">
         <div>
-          <h2 className="fw-bold mb-1">📊Gösterge Paneli</h2>
+          <h2 className="fw-bold mb-1">
+            📊 Gösterge Paneli
+          </h2>
           <small className="text-muted">
             Bakım Takip Sistemine Hoş Geldiniz
           </small>
         </div>
 
-        
         {showNotifications && (
           <div
             className="card shadow-sm border-0"

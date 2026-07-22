@@ -125,7 +125,6 @@ function Urunler() {
     const filtrelenmisUrunler = urunler.filter((urun) => {
         const arama = aramaMetni.toLowerCase();
         
-        // İsim, kod, marka veya model eşleşme kontrolü
         const isimEslesti = urun.productName?.toLowerCase().includes(arama);
         const kodEslesti = urun.productCode?.toLowerCase().includes(arama);
         const markaEslesti = urun.brand?.toLowerCase().includes(arama);

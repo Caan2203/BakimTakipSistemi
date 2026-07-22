@@ -42,7 +42,13 @@ namespace BakimAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("LastLogin")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("OlusturmaTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("PasswordChangedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Rol")

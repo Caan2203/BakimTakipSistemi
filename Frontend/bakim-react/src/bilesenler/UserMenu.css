@@ -98,9 +98,9 @@
 }
 
 .avatar.large {
-    width: 56px;
-    height: 56px;
-    font-size: 22px;
+    width: 72px;
+    height: 72px;
+    font-size: 28px;
 }
 
 .user-name {
@@ -155,9 +155,8 @@
 
 .user-dropdown hr {
     border: none;
-    height: 1px;
-    background: #f1f5f9;
-    margin: 12px 0;
+    border-bottom: 1px solid #eef2f7;
+    margin: 18px 0;
 }
 
 .dropdown-item {
@@ -192,11 +191,16 @@
 
 .summary-item {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 9px 12px;
-    font-size: 14px;
-    color: #475569;
+    align-items: center;
+    padding: 10px 12px;
+    margin-top: 8px;
+    border-radius: 10px;
+    transition: .25s;
+}
+
+.summary-item:hover {
+    background: #f4f7ff;
 }
 
 .summary-item span {
@@ -240,4 +244,19 @@
         opacity: 1;
         transform: translateY(0) scale(1);
     }
+}
+
+.user-email,
+.user-department {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.user-email i,
+.user-department i {
+    color: #3b82f6;
 }

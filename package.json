@@ -4,8 +4,11 @@
     "@tsparticles/slim": "^4.3.2",
     "axios": "^1.18.1",
     "bootstrap-icons": "^1.13.1",
+    "file-saver": "^2.0.5",
+    "pdfmake": "^0.2.10",
     "react-countup": "^6.5.3",
     "react-hot-toast": "^2.6.0",
-    "sweetalert2": "^11.26.25"
+    "sweetalert2": "^11.26.25",
+    "xlsx": "^0.18.5"
   }
 }

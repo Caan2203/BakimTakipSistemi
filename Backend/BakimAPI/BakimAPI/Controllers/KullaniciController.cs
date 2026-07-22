@@ -4,6 +4,7 @@ using BakimAPI.DTOs;
 using BakimAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using BakimAPI.Servisler;
+
 namespace BakimAPI.Controllers;
 
 [Route("api/[controller]")]
@@ -12,9 +13,10 @@ public class KullaniciController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly TokenServisi _tokenServisi;
+
     public KullaniciController(
-     ApplicationDbContext context,
-     TokenServisi tokenServisi)
+        ApplicationDbContext context,
+        TokenServisi tokenServisi)
     {
         _context = context;
         _tokenServisi = tokenServisi;
@@ -67,6 +69,11 @@ public class KullaniciController : ControllerBase
         {
             return BadRequest("Şifre hatalı.");
         }
+
+        // Son giriş tarihini güncelle
+        kullanici.LastLogin = DateTime.Now;
+        await _context.SaveChangesAsync();
+
         string token = _tokenServisi.TokenOlustur(kullanici);
 
         return Ok(new
@@ -76,7 +83,8 @@ public class KullaniciController : ControllerBase
             Kullanici = kullanici.KullaniciAdi,
             Rol = kullanici.Rol,
             Ad = kullanici.Ad,
-            Soyad = kullanici.Soyad
+            Soyad = kullanici.Soyad,
+            LastLogin = kullanici.LastLogin
         });
     }
 }

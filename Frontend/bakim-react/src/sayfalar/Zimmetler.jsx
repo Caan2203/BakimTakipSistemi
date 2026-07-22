@@ -4,7 +4,8 @@ import { zimmetleriGetir, zimmetEkle, zimmetIadeEt } from "../services/zimmetSer
 import { personelleriGetir } from "../services/personelServisi";
 import { urunleriGetir, uygunUrunleriGetir } from "../services/urunServisi";
 import { useLocation } from "react-router-dom";
-
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 function Zimmetler() {
     const [zimmetler, setZimmetler] = useState([]);
@@ -58,6 +59,49 @@ function Zimmetler() {
         } catch (hata) {
             console.error("Personeller yüklenirken hata oluştu:", hata);
         }
+    };
+
+    // Excel oluşturma fonksiyonu (Gelişmiş Formatlama İle)
+    const excelAktar = () => {
+        const excelData = zimmetler.map((z, index) => ({
+            "Sıra No": index + 1,
+            "Ürün Adı": z.product?.productName || "-",
+            "Personel": z.employee
+                ? `${z.employee.firstName} ${z.employee.lastName}`
+                : "-",
+            "Teslim Tarihi": z.verilisTarihi
+                ? new Date(z.verilisTarihi).toLocaleDateString("tr-TR")
+                : "-",
+            "Durum": z.aktifMi ? "Aktif" : "İade"
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+        worksheet["!cols"] = [
+            { wch: 10 },
+            { wch: 35 },
+            { wch: 30 },
+            { wch: 20 },
+            { wch: 15 }
+        ];
+
+        const workbook = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(
+            workbook,
+            worksheet,
+            "Zimmet Listesi"
+        );
+
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "array"
+        });
+
+        saveAs(
+            new Blob([excelBuffer]),
+            `Zimmet_Listesi_${new Date().toLocaleDateString("tr-TR")}.xlsx`
+        );
     };
 
     const kaydet = async () => {
@@ -143,12 +187,20 @@ function Zimmetler() {
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>📝 Zimmet Yönetimi</h2>
-                <button
-                    className="btn btn-primary"
-                    onClick={() => setModalAcik(true)}
-                >
-                    ➕ Yeni Zimmet
-                </button>
+                <div className="d-flex gap-2">
+                    <button
+                        className="btn btn-success"
+                        onClick={excelAktar}>
+                        <i className="bi bi-file-earmark-excel me-2"></i>
+                        Excel'e Aktar
+                    </button>
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => setModalAcik(true)}
+                    >
+                        ➕ Yeni Zimmet
+                    </button>
+                </div>
             </div>
 
             <table className="table table-bordered table-hover">

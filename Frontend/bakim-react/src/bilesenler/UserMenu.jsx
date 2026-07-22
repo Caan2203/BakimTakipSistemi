@@ -1,12 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import "./UserMenu.css";
 import ProfilModal from "./ProfilModal";
-
+import SifreDegistirModal from "./SifreDegistirModal";
 
 export default function UserMenu() {
     const [open, setOpen] = useState(false);
-    const ref = useRef(null);
     const [showProfile, setShowProfile] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [timeAgo, setTimeAgo] = useState("");
+    
+    const ref = useRef(null);
+    const lastLogin = localStorage.getItem("lastLogin");
 
     // Menü dışına tıklandığında menüyü kapatma mantığı
     useEffect(() => {
@@ -19,6 +24,52 @@ export default function UserMenu() {
         document.addEventListener("mousedown", close);
         return () => document.removeEventListener("mousedown", close);
     }, []);
+
+    // Son giriş zamanını göreceli olarak hesaplayan ve her dakika güncelleyen Effect
+    useEffect(() => {
+        const updateTime = () => {
+            if (!lastLogin) {
+                setTimeAgo("-");
+                return;
+            }
+
+            const loginDate = new Date(lastLogin);
+            const now = new Date();
+            const diff = Math.floor((now - loginDate) / 1000);
+
+            if (diff < 60) {
+                setTimeAgo("🟢 Az önce");
+            }
+            else if (diff < 3600) {
+                setTimeAgo(`🟢 ${Math.floor(diff / 60)} dakika önce`);
+            }
+            else if (diff < 86400) {
+                setTimeAgo(`🟡 ${Math.floor(diff / 3600)} saat önce`);
+            }
+            else if (diff < 172800) {
+                setTimeAgo(
+                    `🔵 Dün ${loginDate.toLocaleTimeString("tr-TR", {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    })}`
+                );
+            }
+            else {
+                setTimeAgo(
+                    loginDate.toLocaleDateString("tr-TR", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric"
+                    })
+                );
+            }
+        };
+
+        updateTime();
+        const timer = setInterval(updateTime, 60000);
+
+        return () => clearInterval(timer);
+    }, [lastLogin]);
 
     // Çıkış yap fonksiyonu
     const handleLogout = () => {
@@ -53,20 +104,29 @@ export default function UserMenu() {
             {open && (
                 <div className="user-dropdown">
                     <div className="dropdown-header">
-                        <div className="avatar large">
+                        <div className="avatar large mb-2">
                             OA
                         </div>
 
-                        <div>
-                            <div className="user-name">
+                        <div className="d-flex flex-column">
+                            <div className="fw-bold fs-4">
                                 Osman Can ACAR
                             </div>
-                            <div className="user-role">
-                                Yönetici
+
+                            <div className="d-flex align-items-center gap-2 mt-1">
+                                <span className="badge bg-primary">
+                                    Yönetici
+                                </span>
+
+                                <span className="text-success">
+                                    ● Çevrimiçi
+                                </span>
                             </div>
-                            <span className="online">
-                                ● Çevrimiçi
-                            </span>
+
+                            <div className="text-muted mt-2 small">
+                                <i className="bi bi-envelope me-2"></i>
+                                osmancan@bakim.com
+                            </div>
                         </div>
                     </div>
 
@@ -74,7 +134,10 @@ export default function UserMenu() {
 
                     <button 
                         className="dropdown-item"
-                        onClick={() => setOpen(false)}
+                        onClick={() => {
+                            setOpen(false);
+                            setShowProfile(true);
+                        }}
                     >
                         <i className="bi bi-person me-2"></i>
                         Profil Bilgileri
@@ -82,7 +145,11 @@ export default function UserMenu() {
 
                     <button 
                         className="dropdown-item"
-                        onClick={() => setOpen(false)}
+                        onClick={() => {
+                            setOpen(false);
+                            setShowPassword(true);
+                            setShowPasswordModal(true);
+                        }}
                     >
                         <i className="bi bi-key me-2"></i>
                         Şifre Değiştir
@@ -95,9 +162,9 @@ export default function UserMenu() {
                     </small>
 
                     <div className="summary-item">
-                        <i className="bi bi-clock-history me-2"></i>
-                        <span>Sistemi Kullanma Süresi</span>
-                        <b>14 Gün</b>
+                        <i className="bi bi-clock-history me-2 text-primary"></i>
+                        <span>Son Giriş</span>
+                        <b>{timeAgo}</b>
                     </div>
 
                     <div className="summary-item">
@@ -129,6 +196,19 @@ export default function UserMenu() {
                     </button>
                 </div>
             )}
+
+            {/* Modallar */}
+            {showProfile && (
+                <ProfilModal 
+                    show={showProfile} 
+                    onClose={() => setShowProfile(false)} 
+                />
+            )}
+
+            <SifreDegistirModal
+                show={showPasswordModal}
+                onClose={() => setShowPasswordModal(false)}
+            />
         </div>
     );
 }

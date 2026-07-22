@@ -390,7 +390,7 @@ function Bakimlar() {
                                             onClick={() => window.open(`/qr-kod/${urun.qrCode}`, "_blank")}
                                             disabled={!urun.qrCode}
                                         >
-                                            QR
+                                            Bilgi + Bakım Yap
                                         </button>
                                     </td>
                                 </tr>

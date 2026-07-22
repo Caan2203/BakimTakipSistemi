@@ -25,6 +25,12 @@ function Giris() {
             localStorage.setItem("rol", cevap.data.rol);
             localStorage.setItem("ad", cevap.data.ad);
             localStorage.setItem("soyad", cevap.data.soyad);
+            
+            // Backend'den gelen cevaba göre lastLogin/LastLogin kaydı
+            const lastLoginData = cevap.data.lastLogin || cevap.data.LastLogin;
+            if (lastLoginData) {
+                localStorage.setItem("lastLogin", lastLoginData);
+            }
 
             navigate("/gosterge-paneli");
         } catch (error) {
@@ -275,7 +281,7 @@ function Giris() {
                                 <i className="bi bi-shield-check me-1"></i> Güvenli Altyapı
                             </span>
                             <h4 className="fw-bold mb-2">Akıllı Bakım & Ürün Yönetimi</h4>
-                            <p className="small text-white-50">Formal Alüminyum San. ve Tic. A.Ş. &  ACAR HOLDİNG işbirliğiyle.©  </p>
+                            <p className="small text-white-50">Formal Alüminyum San. ve Tic. A.Ş. & ACAR HOLDİNG işbirliğiyle.© </p>
                         </div>
 
                         {/* Büyütülmüş Ambians Görseli */}
