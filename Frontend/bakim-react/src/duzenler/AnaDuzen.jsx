@@ -8,6 +8,9 @@ function AnaDuzen() {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [darkMode, setDarkMode] = useState(
+        localStorage.getItem("theme") === "dark"
+    );
 
     const loadNotifications = async () => {
         try {
@@ -28,6 +31,16 @@ function AnaDuzen() {
         return () => clearInterval(timer);
     }, []);
 
+    useEffect(() => {
+        if (darkMode) {
+            document.body.classList.add("dark-mode");
+            localStorage.setItem("theme", "dark");
+        } else {
+            document.body.classList.remove("dark-mode");
+            localStorage.setItem("theme", "light");
+        }
+    }, [darkMode]);
+
     const notificationClick = (item) => {
         setShowNotifications(false);
 
@@ -37,8 +50,6 @@ function AnaDuzen() {
     };
 
     const unreadCount = notifications.length;
-
-    // Sağ Üst Bildirim Bileşeni
     const NotificationBell = () => (
         <div className="position-relative">
             <button
@@ -53,8 +64,6 @@ function AnaDuzen() {
                     </span>
                 )}
             </button>
-
-            {/* Açılır Bildirim Kutusu */}
             {showNotifications && (
                 <div
                     className="card shadow-sm border-0"
@@ -103,12 +112,9 @@ function AnaDuzen() {
                 overflow: "hidden" 
             }}
         >
-            {/* SOL MENÜ */}
             <div className="d-flex flex-column bg-white border-end" style={{ width: "280px", height: "100vh", overflowY: "auto" }}>
                 <Menu />
             </div>
-
-            {/* SAĞ İÇERİK ALANI */}
             <div
                 className="flex-grow-1 position-relative"
                 style={{
@@ -120,7 +126,23 @@ function AnaDuzen() {
             >
                 <div className="container-fluid p-4">
                     <div className="d-flex justify-content-end align-items-center gap-3 mb-4">
+                        <button
+                            className="btn btn-light shadow-sm rounded-circle"
+                            style={{ width: "48px", height: "48px" }}
+                            onClick={() => setDarkMode(!darkMode)}
+                            title={darkMode ? "Açık Tema" : "Karanlık Tema"}
+                        >
+                            <i
+                                className={
+                                    darkMode
+                                        ? "bi bi-sun-fill text-warning"
+                                        : "bi bi-moon-fill"
+                                }
+                            ></i>
+                        </button>
+
                         <NotificationBell />
+
                         <UserMenu />
                     </div>
 

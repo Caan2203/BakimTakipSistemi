@@ -22,6 +22,9 @@ public class DashboardDto
 
     public List<Product> OverdueProducts { get; set; } = new();
 
+    public List<Product> UpcomingWarrantyProducts { get; set; }
+    = new();
+
     public List<string> MonthlyLabels { get; set; } = new();
 
     public List<int> MonthlyMaintenanceCounts { get; set; } = new();

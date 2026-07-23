@@ -52,7 +52,6 @@ function Dashboard() {
 
     return (
         <div className="container mt-4">
-            {/* Sağ Üst Header */}
             <div className="top-header">
                 <div></div>
                 <div className="header-actions">

@@ -9,7 +9,6 @@ namespace BakimAPI.Controllers
         [HttpPost("change-password")]
         public IActionResult ChangePassword(ChangePasswordDto dto)
         {
-            // Şimdilik demo
             if (dto.CurrentPassword != "1234")
             {
                 return BadRequest(new

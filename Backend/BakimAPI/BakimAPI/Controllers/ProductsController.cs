@@ -162,7 +162,9 @@ namespace BakimAPI.Controllers
             existingProduct.MaintenancePeriodDay = product.MaintenancePeriodDay;
             existingProduct.LastMaintenanceDate = product.LastMaintenanceDate;
             existingProduct.NextMaintenanceDate = product.NextMaintenanceDate;
-
+            existingProduct.PurchaseDate = product.PurchaseDate;
+            existingProduct.WarrantyStartDate = product.WarrantyStartDate;
+            existingProduct.WarrantyEndDate = product.WarrantyEndDate;
             try
             {
                 await _context.SaveChangesAsync();

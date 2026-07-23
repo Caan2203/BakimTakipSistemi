@@ -42,4 +42,13 @@ public class Product
     = new List<ProductHistory>();
 
     public bool IsDeleted { get; set; } = false;
+
+
+    public DateTime PurchaseDate { get; set; }
+
+    public DateTime WarrantyStartDate { get; set; }
+
+    public DateTime WarrantyEndDate { get; set; }
+
+
 }

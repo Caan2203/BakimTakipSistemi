@@ -52,6 +52,8 @@ function GostergePaneli() {
     );
   }
 
+  const garantiYaklasan = dashboard?.upcomingWarrantyProducts || [];
+
   const grafikVerisi = {
     labels: dashboard.monthlyLabels || [],
     datasets: [
@@ -75,9 +77,7 @@ function GostergePaneli() {
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4 position-relative">
         <div>
-          <h2 className="fw-bold mb-1">
-            📊 Gösterge Paneli
-          </h2>
+          <h2 className="fw-bold mb-1">📊 Gösterge Paneli</h2>
           <small className="text-muted">
             Bakım Takip Sistemine Hoş Geldiniz
           </small>
@@ -94,9 +94,7 @@ function GostergePaneli() {
               zIndex: 999
             }}
           >
-            <div className="card-header bg-white fw-bold">
-              Bildirimler
-            </div>
+            <div className="card-header bg-white fw-bold">Bildirimler</div>
 
             <div className="list-group list-group-flush">
               {notifications.length === 0 ? (
@@ -120,7 +118,7 @@ function GostergePaneli() {
           <div className="card shadow-lg border-0 h-100">
             <div className="card-body text-center">
               <h5 className="fw-semibold">Toplam Ürün</h5>
-              <h2 className="fw-bold ">{dashboard.totalProducts}</h2>
+              <h2 className="fw-bold">{dashboard.totalProducts}</h2>
             </div>
           </div>
         </div>
@@ -149,6 +147,7 @@ function GostergePaneli() {
           </div>
         </div>
       </div>
+
       <div className="row">
         <div className="col-md-6 mb-3">
           <div className="card border-success shadow-lg h-100">
@@ -172,6 +171,7 @@ function GostergePaneli() {
         </div>
       </div>
 
+      {/* ÇİZGİ GRAFİK */}
       <div className="card shadow-lg border-0">
         <div className="card-header">
           <h5 className="fw-semibold mb-0">Son 6 Ay Bakım Grafiği</h5>
@@ -180,25 +180,35 @@ function GostergePaneli() {
           <Line data={grafikVerisi} />
         </div>
       </div>
+
       <div className="row mt-4">
-        <div className="col-md-6 mb-3">
+        {/* Yaklaşan Bakımlar */}
+        <div className="col-md-4 mb-3">
           <div className="card shadow-lg border-success h-100">
             <div className="card-header bg-success text-white">
-              <h5 className="fw-semibold mb-0">Yaklaşan Bakımı Olan Ürünler</h5>
+              <h5 className="fw-semibold mb-0">Yaklaşan Bakımı Olanlar</h5>
             </div>
             <div className="card-body">
               {upcomingProducts.length === 0 ? (
-                <p className="text-center">Yaklaşan bakım bulunmuyor.</p>
+                <p className="text-center text-muted mb-0">
+                  Yaklaşan bakım bulunmuyor.
+                </p>
               ) : (
                 upcomingProducts.map((urun) => (
                   <div key={urun.id} className="border-bottom pb-2 mb-2">
                     <b>{urun.productName}</b>
                     <br />
-                    <small>{urun.brand} {urun.model}</small>
+                    <small>
+                      {urun.brand} {urun.model}
+                    </small>
                     <br />
                     <small className="text-success">
-                      Bakım Tarihi : {" "}
-                      {urun.nextMaintenanceDate ? new Date(urun.nextMaintenanceDate).toLocaleDateString("tr-TR") : "-"}
+                      Bakım Tarihi :{" "}
+                      {urun.nextMaintenanceDate
+                        ? new Date(urun.nextMaintenanceDate).toLocaleDateString(
+                            "tr-TR"
+                          )
+                        : "-"}
                     </small>
                   </div>
                 ))
@@ -207,20 +217,25 @@ function GostergePaneli() {
           </div>
         </div>
 
-        <div className="col-md-6 mb-3">
+        {/* Bakımı Gecikenler */}
+        <div className="col-md-4 mb-3">
           <div className="card shadow-lg border-danger h-100">
             <div className="card-header bg-danger text-white">
               <h5 className="fw-semibold mb-0">Bakımı Geciken Ürünler</h5>
             </div>
             <div className="card-body">
               {overdueProducts.length === 0 ? (
-                <p className="text-center">Geciken bakım bulunmuyor.</p>
+                <p className="text-center text-muted mb-0">
+                  Geciken bakım bulunmuyor.
+                </p>
               ) : (
                 overdueProducts.map((urun) => (
                   <div key={urun.id} className="border-bottom pb-2 mb-2">
                     <b>{urun.productName}</b>
                     <br />
-                    <small>{urun.brand} {urun.model}</small>
+                    <small>
+                      {urun.brand} {urun.model}
+                    </small>
                     <br />
                     <span className="badge bg-danger">Bakımı Gecikmiş</span>
                   </div>
@@ -229,7 +244,46 @@ function GostergePaneli() {
             </div>
           </div>
         </div>
+
+        {/* Yakında Garanti Bitecek */}
+        <div className="col-md-4 mb-3">
+          <div className="card shadow-lg border-primary h-100">
+            <div className="card-header bg-primary text-white">
+              <h5 className="fw-semibold mb-0">Yakında Garanti Bitecek</h5>
+            </div>
+            <div className="card-body">
+              {garantiYaklasan.length === 0 ? (
+                <p className="text-center text-muted mb-0">
+                  Yaklaşan garanti bulunmuyor.
+                </p>
+              ) : (
+                garantiYaklasan.map((urun) => {
+                  const kalanGun = Math.ceil(
+                    (new Date(urun.warrantyEndDate) - new Date()) /
+                      (1000 * 60 * 60 * 24)
+                  );
+
+                  return (
+                    <div key={urun.id} className="border-bottom pb-2 mb-2">
+                      <b>{urun.productName}</b>
+                      <br />
+                      <small>
+                        {urun.brand} {urun.model}
+                      </small>
+                      <br />
+                      <span className="badge bg-primary">
+                        {kalanGun} Gün Kaldı
+                      </span>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* TABLOLAR */}
       <div className="card shadow-lg border-0 mt-4">
         <div className="card-header">
           <h5 className="fw-semibold mb-0">Son Yapılan Bakımlar</h5>
@@ -259,7 +313,11 @@ function GostergePaneli() {
                       {bakim.employee?.firstName} {bakim.employee?.lastName}
                     </td>
                     <td>
-                      {bakim.maintenanceDate ? new Date(bakim.maintenanceDate).toLocaleDateString("tr-TR") : "-"}
+                      {bakim.maintenanceDate
+                        ? new Date(
+                            bakim.maintenanceDate
+                          ).toLocaleDateString("tr-TR")
+                        : "-"}
                     </td>
                     <td>
                       <span className="badge bg-success">{bakim.status}</span>
@@ -271,6 +329,7 @@ function GostergePaneli() {
           </table>
         </div>
       </div>
+
       <div className="card shadow-lg border-0 mt-4">
         <div className="card-header bg-dark text-white">
           <h5 className="fw-semibold mb-0">Son Ürün Hareketleri</h5>
@@ -310,6 +369,7 @@ function GostergePaneli() {
           </table>
         </div>
       </div>
+
       <div className="text-center mt-4 mb-5">
         <small className="text-muted">
           ACAR Bakım Takip Sistemi © 2026

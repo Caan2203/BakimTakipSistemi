@@ -12,8 +12,6 @@ export default function UserMenu() {
     
     const ref = useRef(null);
     const lastLogin = localStorage.getItem("lastLogin");
-
-    // Menü dışına tıklandığında menüyü kapatma mantığı
     useEffect(() => {
         const close = (e) => {
             if (ref.current && !ref.current.contains(e.target)) {
@@ -24,8 +22,6 @@ export default function UserMenu() {
         document.addEventListener("mousedown", close);
         return () => document.removeEventListener("mousedown", close);
     }, []);
-
-    // Son giriş zamanını göreceli olarak hesaplayan ve her dakika güncelleyen Effect
     useEffect(() => {
         const updateTime = () => {
             if (!lastLogin) {
@@ -70,8 +66,6 @@ export default function UserMenu() {
 
         return () => clearInterval(timer);
     }, [lastLogin]);
-
-    // Çıkış yap fonksiyonu
     const handleLogout = () => {
         localStorage.clear();
         window.location.reload();
@@ -79,7 +73,6 @@ export default function UserMenu() {
 
     return (
         <div className="user-menu" ref={ref}>
-            {/* Kapalıyken ve açıkken sürekli görünen tetikleyici buton */}
             <div
                 className="user-trigger"
                 onClick={() => setOpen(!open)}
@@ -99,8 +92,6 @@ export default function UserMenu() {
 
                 <i className={`bi bi-chevron-${open ? "up" : "down"}`}></i>
             </div>
-
-            {/* Sadece open true olduğunda ekrana gelen dropdown menü */}
             {open && (
                 <div className="user-dropdown">
                     <div className="dropdown-header">
@@ -196,8 +187,6 @@ export default function UserMenu() {
                     </button>
                 </div>
             )}
-
-            {/* Modallar */}
             {showProfile && (
                 <ProfilModal 
                     show={showProfile} 

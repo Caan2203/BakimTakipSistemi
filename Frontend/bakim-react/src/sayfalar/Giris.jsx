@@ -25,8 +25,6 @@ function Giris() {
             localStorage.setItem("rol", cevap.data.rol);
             localStorage.setItem("ad", cevap.data.ad);
             localStorage.setItem("soyad", cevap.data.soyad);
-            
-            // Backend'den gelen cevaba göre lastLogin/LastLogin kaydı
             const lastLoginData = cevap.data.lastLogin || cevap.data.LastLogin;
             if (lastLoginData) {
                 localStorage.setItem("lastLogin", lastLoginData);
@@ -59,8 +57,6 @@ function Giris() {
             }}
         >
             <div className="grid-bg"></div>
-
-            {/* Fareyi Takip Eden Işık */}
             <div
                 style={{
                     position: "absolute",
@@ -77,13 +73,9 @@ function Giris() {
                     zIndex: 2
                 }}
             ></div>
-
-            {/* Kendi Kendine Hareket Eden Ambians Küreleri */}
             <div className="ambient-orb orb-1"></div>
             <div className="ambient-orb orb-2"></div>
             <div className="ambient-orb orb-3"></div>
-
-            {/* Çift Kolonlu Giriş Kartı */}
             <div
                 className="card login-card border-0 overflow-hidden"
                 style={{
@@ -254,7 +246,6 @@ function Giris() {
                 `}</style>
 
                 <div className="row g-0 align-items-center">
-                    {/* SOL TARAF: Görsel ve Ambians Paneli */}
                     <div 
                         className="col-lg-6 d-none d-lg-flex flex-column justify-content-between p-5 text-white position-relative overflow-hidden"
                         style={{
@@ -262,7 +253,6 @@ function Giris() {
                             minHeight: "560px"
                         }}
                     >
-                        {/* Görsel Bölümündeki Işık Süzmesi */}
                         <div 
                             className="position-absolute"
                             style={{
@@ -280,11 +270,8 @@ function Giris() {
                             <span className="badge bg-white text-primary rounded-pill px-3 py-2 fw-semibold mb-3 shadow-sm">
                                 <i className="bi bi-shield-check me-1"></i> Güvenli Altyapı
                             </span>
-                            <h4 className="fw-bold mb-2">Akıllı Bakım & Ürün Yönetimi</h4>
                             <p className="small text-white-50">Formal Alüminyum San. ve Tic. A.Ş. & ACAR HOLDİNG işbirliğiyle.© </p>
                         </div>
-
-                        {/* Büyütülmüş Ambians Görseli */}
                         <div className="text-center my-4 hero-img-floating">
                             <img 
                                 src="/İmages.jpeg" 
@@ -309,8 +296,6 @@ function Giris() {
                             </div>
                         </div>
                     </div>
-
-                    {/* SAĞ TARAF: Giriş Formu */}
                     <div className="col-lg-6">
                         <form
                             className="card-body p-4 p-md-5"

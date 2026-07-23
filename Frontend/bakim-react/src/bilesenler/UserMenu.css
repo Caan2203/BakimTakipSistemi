@@ -260,3 +260,84 @@
 .user-department i {
     color: #3b82f6;
 }
+
+body.dark .avatar,
+.dark-mode .avatar {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+body.dark .user-email,
+body.dark .user-department,
+.dark-mode .user-email,
+.dark-mode .user-department {
+    color: #bbb;
+}
+
+body.dark .menu-title,
+.dark-mode .menu-title {
+    color: #888;
+}
+
+body.dark .online,
+.dark-mode .online {
+    color: #4ade80;
+}
+.dark-mode .user-trigger,
+body.dark .user-trigger {
+    background: #1f1f1f;
+    border-color: #404040;
+    color: #fff;
+}
+
+.dark-mode .user-name,
+body.dark .user-name {
+    color: #fff;
+}
+
+.dark-mode .user-role,
+body.dark .user-role {
+    background: #2b4ea2;
+    color: #fff;
+}
+
+.dark-mode .user-trigger i,
+body.dark .user-trigger i {
+    color: #d1d5db;
+}
+
+.dark-mode .user-dropdown,
+body.dark .user-dropdown {
+    background: #222;
+    border-color: #444;
+    color: white;
+}
+
+.dark-mode .dropdown-item,
+body.dark .dropdown-item {
+    color: white;
+}
+
+.dark-mode .dropdown-item:hover,
+body.dark .dropdown-item:hover {
+    background: #333;
+}
+
+.dark-mode .summary-item:hover,
+body.dark .summary-item:hover {
+    background: #333;
+}
+
+.dark-mode .summary-item b,
+body.dark .summary-item b {
+    color: white;
+}
+
+.dark-mode .user-dropdown hr,
+body.dark .user-dropdown hr {
+    border-bottom: 1px solid #444;
+}
+
+.dark-mode .menu-title,
+body.dark .menu-title {
+    color: #9ca3af;
+}

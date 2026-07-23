@@ -69,8 +69,6 @@ public class KullaniciController : ControllerBase
         {
             return BadRequest("Şifre hatalı.");
         }
-
-        // Son giriş tarihini güncelle
         kullanici.LastLogin = DateTime.Now;
         await _context.SaveChangesAsync();
 

@@ -1,8 +1,8 @@
 ﻿using BakimAPI.Data;
+using BakimAPI.DTOs;
 using BakimAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BakimAPI.DTOs;
 
 namespace BakimAPI.Controllers
 {
@@ -17,12 +17,10 @@ namespace BakimAPI.Controllers
             _context = context;
         }
 
-
         [HttpGet]
         public async Task<ActionResult<DashboardDto>> GetDashboard()
         {
             var dashboard = new DashboardDto();
-
 
             dashboard.TotalProducts =
                 await _context.Products.CountAsync();
@@ -47,7 +45,6 @@ namespace BakimAPI.Controllers
                     x.NextMaintenanceDate.HasValue &&
                     x.NextMaintenanceDate.Value < DateTime.Today);
 
-
             dashboard.LastMaintenances =
                 await _context.Maintenances
                     .Include(x => x.Product)
@@ -63,6 +60,17 @@ namespace BakimAPI.Controllers
                         x.NextMaintenanceDate.Value >= DateTime.Today &&
                         x.NextMaintenanceDate.Value <= DateTime.Today.AddDays(30))
                     .OrderBy(x => x.NextMaintenanceDate)
+                    .Take(5)
+                    .ToListAsync();
+
+            dashboard.UpcomingWarrantyProducts =
+                await _context.Products
+                    .Where(x =>
+                        !x.IsDeleted &&
+                        x.WarrantyEndDate != default &&
+                        x.WarrantyEndDate >= DateTime.Today &&
+                        x.WarrantyEndDate <= DateTime.Today.AddDays(30))
+                    .OrderBy(x => x.WarrantyEndDate)
                     .Take(5)
                     .ToListAsync();
 
@@ -91,14 +99,13 @@ namespace BakimAPI.Controllers
                     x.MaintenanceDate.Year == tarih.Year);
 
                 dashboard.MonthlyMaintenanceCounts.Add(adet);
-
-
             }
+
             dashboard.LastProductActions =
-    await _context.ProductHistories
-        .OrderByDescending(x => x.Date)
-        .Take(10)
-        .ToListAsync();
+                await _context.ProductHistories
+                    .OrderByDescending(x => x.Date)
+                    .Take(10)
+                    .ToListAsync();
 
             return Ok(dashboard);
         }

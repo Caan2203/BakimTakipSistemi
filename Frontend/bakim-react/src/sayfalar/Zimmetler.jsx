@@ -60,8 +60,6 @@ function Zimmetler() {
             console.error("Personeller yüklenirken hata oluştu:", hata);
         }
     };
-
-    // Excel oluşturma fonksiyonu (Gelişmiş Formatlama İle)
     const excelAktar = () => {
         const excelData = zimmetler.map((z, index) => ({
             "Sıra No": index + 1,

@@ -29,8 +29,6 @@ function PersonelDetay() {
 
     return (
         <div className="container mt-4">
-            
-            {/* Üst Başlık */}
             <div className="d-flex align-items-center justify-content-between mb-3">
                 <h2>👤 Personel Detay Profili</h2>
             </div>

@@ -16,6 +16,20 @@ function Urunler() {
     const [modalAcik, setModalAcik] = useState(false);
     const [aramaMetni, setAramaMetni] = useState("");
     const navigate = useNavigate();
+    const gecerliTarihMi = (tarihStr) => {
+        if (!tarihStr) return false;
+        if (tarihStr.startsWith("0001")) return false;
+        const d = new Date(tarihStr);
+        return !isNaN(d.getTime());
+    };
+    const tarihFormatlaTR = (tarihStr) => {
+        if (!gecerliTarihMi(tarihStr)) return "-";
+        return new Date(tarihStr).toLocaleDateString("tr-TR");
+    };
+    const tarihFormatla = (tarihStr) => {
+        if (!gecerliTarihMi(tarihStr)) return "";
+        return tarihStr.split("T")[0];
+    };
 
     const [yeniUrun, setYeniUrun] = useState({
         productCode: "",
@@ -23,7 +37,11 @@ function Urunler() {
         brand: "",
         model: "",
         location: "",
-        maintenancePeriodDay: 30
+        maintenancePeriodDay: 30,
+
+        purchaseDate: "",
+        warrantyStartDate: "",
+        warrantyEndDate: ""
     });
 
     useEffect(() => {
@@ -75,12 +93,16 @@ function Urunler() {
                 brand: "",
                 model: "",
                 location: "",
-                maintenancePeriodDay: 30
+                maintenancePeriodDay: 30,
+
+                purchaseDate: "",
+                warrantyStartDate: "",
+                warrantyEndDate: ""
             });
 
             setModalAcik(false);
             setDuzenlemeModu(false);
-            await urunleriYukle(); 
+            await urunleriYukle();
         } catch (hata) {
             console.error("Hata detayı:", hata.response?.data);
             Swal.fire({
@@ -122,19 +144,21 @@ function Urunler() {
             });
         }
     };
+
     const filtrelenmisUrunler = urunler.filter((urun) => {
         const arama = aramaMetni.toLowerCase();
-        
+
         const isimEslesti = urun.productName?.toLowerCase().includes(arama);
         const kodEslesti = urun.productCode?.toLowerCase().includes(arama);
         const markaEslesti = urun.brand?.toLowerCase().includes(arama);
         const modelEslesti = urun.model?.toLowerCase().includes(arama);
-        const kategoriEslesti = 
-            kategoriFiltre === "" || 
+        const kategoriEslesti =
+            kategoriFiltre === "" ||
             urun.category === kategoriFiltre;
 
         return (isimEslesti || kodEslesti || markaEslesti || modelEslesti) && kategoriEslesti;
     });
+
     const hucreStili = { padding: "18px" };
 
     return (
@@ -173,7 +197,11 @@ function Urunler() {
                                     brand: "",
                                     model: "",
                                     location: "",
-                                    maintenancePeriodDay: 30
+                                    maintenancePeriodDay: 30,
+
+                                    purchaseDate: "",
+                                    warrantyStartDate: "",
+                                    warrantyEndDate: ""
                                 });
                                 setModalAcik(true);
                             }}
@@ -230,6 +258,8 @@ function Urunler() {
                                         <th style={hucreStili}>Marka</th>
                                         <th style={hucreStili}>Son Bakım</th>
                                         <th style={hucreStili}>Sonraki Bakım</th>
+                                        <th style={hucreStili}>Garanti Bitiş</th>
+                                        <th style={hucreStili}>Garanti Durumu</th>
                                         <th style={hucreStili}>Durum</th>
                                         <th style={hucreStili}>İşlemler</th>
                                     </tr>
@@ -237,7 +267,41 @@ function Urunler() {
                                 <tbody className="align-middle">
                                     {filtrelenmisUrunler.map((urun) => {
                                         const bugun = new Date();
-                                        const sonrakiBakim = urun.nextMaintenanceDate
+
+                                        let garantiBadge = (
+                                            <span className="badge bg-secondary">
+                                                Bilinmiyor
+                                            </span>
+                                        );
+                                        if (gecerliTarihMi(urun.warrantyEndDate)) {
+                                            const garantiBitis = new Date(urun.warrantyEndDate);
+                                            const kalanGun = Math.ceil(
+                                                (garantiBitis - bugun) /
+                                                (1000 * 60 * 60 * 24)
+                                            );
+
+                                            if (kalanGun < 0) {
+                                                garantiBadge = (
+                                                    <span className="badge bg-danger">
+                                                        Garanti Bitti
+                                                    </span>
+                                                );
+                                            } else if (kalanGun <= 30) {
+                                                garantiBadge = (
+                                                    <span className="badge bg-warning text-dark">
+                                                        {kalanGun} Gün Kaldı
+                                                    </span>
+                                                );
+                                            } else {
+                                                garantiBadge = (
+                                                    <span className="badge bg-success">
+                                                        Devam Ediyor
+                                                    </span>
+                                                );
+                                            }
+                                        }
+
+                                        const sonrakiBakim = gecerliTarihMi(urun.nextMaintenanceDate)
                                             ? new Date(urun.nextMaintenanceDate)
                                             : null;
 
@@ -269,14 +333,17 @@ function Urunler() {
                                                 <td style={hucreStili}>{urun.productName}</td>
                                                 <td style={hucreStili}>{urun.brand}</td>
                                                 <td style={hucreStili}>
-                                                    {urun.lastMaintenanceDate
-                                                        ? new Date(urun.lastMaintenanceDate).toLocaleDateString("tr-TR")
-                                                        : "-"}
+                                                    {tarihFormatlaTR(urun.lastMaintenanceDate)}
                                                 </td>
                                                 <td style={hucreStili}>
-                                                    {urun.nextMaintenanceDate
-                                                        ? new Date(urun.nextMaintenanceDate).toLocaleDateString("tr-TR")
-                                                        : "-"}
+                                                    {tarihFormatlaTR(urun.nextMaintenanceDate)}
+                                                </td>
+                                                {/* Garanti Bitiş Tarihi Tablo Sütunu (GG.AA.YYYY) */}
+                                                <td style={hucreStili}>
+                                                    {tarihFormatlaTR(urun.warrantyEndDate)}
+                                                </td>
+                                                <td style={hucreStili}>
+                                                    {garantiBadge}
                                                 </td>
                                                 <td style={hucreStili}>{durum}</td>
                                                 <td style={{ whiteSpace: "nowrap", width: "220px", ...hucreStili }}>
@@ -285,7 +352,12 @@ function Urunler() {
                                                         onClick={() => {
                                                             setDuzenlemeModu(true);
                                                             setModalAcik(true);
-                                                            setYeniUrun(urun);
+                                                            setYeniUrun({
+                                                                ...urun,
+                                                                purchaseDate: tarihFormatla(urun.purchaseDate),
+                                                                warrantyStartDate: tarihFormatla(urun.warrantyStartDate),
+                                                                warrantyEndDate: tarihFormatla(urun.warrantyEndDate)
+                                                            });
                                                         }}
                                                     >
                                                         Düzenle
@@ -313,7 +385,7 @@ function Urunler() {
                                     })}
                                     {filtrelenmisUrunler.length === 0 && (
                                         <tr>
-                                            <td colSpan="8" className="text-center text-muted" style={hucreStili}>
+                                            <td colSpan="10" className="text-center text-muted" style={hucreStili}>
                                                 Ürün bulunamadı.
                                             </td>
                                         </tr>
@@ -442,6 +514,52 @@ function Urunler() {
                                                 setYeniUrun({
                                                     ...yeniUrun,
                                                     location: e.target.value
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <hr />
+                                    <h6 className="fw-bold mb-3">
+                                        🛡️ Garanti Bilgileri
+                                    </h6>
+                                    <div className="mb-3">
+                                        <label className="form-label">Satın Alma Tarihi</label>
+                                        <input
+                                            type="date"
+                                            className="form-control"
+                                            value={yeniUrun.purchaseDate || ""}
+                                            onChange={(e) =>
+                                                setYeniUrun({
+                                                    ...yeniUrun,
+                                                    purchaseDate: e.target.value
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Garanti Başlangıcı</label>
+                                        <input
+                                            type="date"
+                                            className="form-control"
+                                            value={yeniUrun.warrantyStartDate || ""}
+                                            onChange={(e) =>
+                                                setYeniUrun({
+                                                    ...yeniUrun,
+                                                    warrantyStartDate: e.target.value
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Garanti Bitişi</label>
+                                        <input
+                                            type="date"
+                                            className="form-control"
+                                            value={yeniUrun.warrantyEndDate || ""}
+                                            onChange={(e) =>
+                                                setYeniUrun({
+                                                    ...yeniUrun,
+                                                    warrantyEndDate: e.target.value
                                                 })
                                             }
                                         />

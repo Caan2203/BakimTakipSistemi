@@ -64,11 +64,11 @@ function Menu() {
             <div>
                 <hr className="text-muted my-3" />
                 <div className="user-profile-card d-flex align-items-center gap-2 p-2 rounded-3 mb-3">
-                    <div className="profile-icon bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style={{ width: "40px", height: "40px", flexShrink: 0 }}>
+                    <div className="profile-icon rounded-circle d-flex align-items-center justify-content-center shadow-sm" style={{ width: "40px", height: "40px", flexShrink: 0 }}>
                         <i className="bi bi-person-circle text-primary fs-4"></i>
                     </div>
                     <div className="overflow-hidden">
-                        <h6 className="mb-0 text-dark fw-bold text-truncate" style={{ maxWidth: "140px" }}>
+                        <h6 className="mb-0 fw-bold text-truncate" style={{ maxWidth: "140px" }}>
                             {ad} {soyad}
                         </h6>
                         <span className={`badge ${getRolBadgeClass(rol)} px-2 py-0.5 rounded-pill mt-1`} style={{ fontSize: "10px" }}>
