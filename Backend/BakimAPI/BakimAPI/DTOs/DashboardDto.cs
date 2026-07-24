@@ -30,4 +30,6 @@ public class DashboardDto
     public List<int> MonthlyMaintenanceCounts { get; set; } = new();
 
     public List<ProductHistory> LastProductActions { get; set; } = new();
+
+    public List<NotificationDto> Notifications { get; set; } = new();
 }

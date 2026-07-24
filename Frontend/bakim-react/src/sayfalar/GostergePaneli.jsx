@@ -27,7 +27,6 @@ ChartJS.register(
 function GostergePaneli() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     dashboardYukle();
@@ -36,6 +35,7 @@ function GostergePaneli() {
   const dashboardYukle = async () => {
     try {
       const response = await api.get("/Dashboard");
+      console.log(response.data);
       setDashboard(response.data);
     } catch (err) {
       console.log(err);
@@ -71,48 +71,20 @@ function GostergePaneli() {
 
   const upcomingProducts = dashboard.upcomingProducts || [];
   const overdueProducts = dashboard.overdueProducts || [];
-  const notifications = dashboard.notifications || [];
 
   return (
     <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-4 position-relative">
+      {/* Üst Başlık */}
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 className="fw-bold mb-1">📊 Gösterge Paneli</h2>
           <small className="text-muted">
             Bakım Takip Sistemine Hoş Geldiniz
           </small>
         </div>
-
-        {showNotifications && (
-          <div
-            className="card shadow-sm border-0"
-            style={{
-              position: "absolute",
-              top: "60px",
-              right: "0px",
-              width: "320px",
-              zIndex: 999
-            }}
-          >
-            <div className="card-header bg-white fw-bold">Bildirimler</div>
-
-            <div className="list-group list-group-flush">
-              {notifications.length === 0 ? (
-                <div className="dropdown-item text-muted text-center py-2">
-                  Bildirim bulunmuyor.
-                </div>
-              ) : (
-                notifications.map((item, index) => (
-                  <div key={index} className="dropdown-item">
-                    {item.icon} {item.message}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
+      {/* İstatistik Kartları */}
       <div className="row">
         <div className="col-md-3 mb-3">
           <div className="card shadow-lg border-0 h-100">
@@ -148,6 +120,7 @@ function GostergePaneli() {
         </div>
       </div>
 
+      {/* Bakım Durumları */}
       <div className="row">
         <div className="col-md-6 mb-3">
           <div className="card border-success shadow-lg h-100">
@@ -171,7 +144,7 @@ function GostergePaneli() {
         </div>
       </div>
 
-      {/* ÇİZGİ GRAFİK */}
+      {/* Grafik */}
       <div className="card shadow-lg border-0">
         <div className="card-header">
           <h5 className="fw-semibold mb-0">Son 6 Ay Bakım Grafiği</h5>
@@ -181,8 +154,8 @@ function GostergePaneli() {
         </div>
       </div>
 
+      {/* Detay Kartları */}
       <div className="row mt-4">
-        {/* Yaklaşan Bakımlar */}
         <div className="col-md-4 mb-3">
           <div className="card shadow-lg border-success h-100">
             <div className="card-header bg-success text-white">
@@ -216,8 +189,6 @@ function GostergePaneli() {
             </div>
           </div>
         </div>
-
-        {/* Bakımı Gecikenler */}
         <div className="col-md-4 mb-3">
           <div className="card shadow-lg border-danger h-100">
             <div className="card-header bg-danger text-white">
@@ -244,17 +215,15 @@ function GostergePaneli() {
             </div>
           </div>
         </div>
-
-        {/* Yakında Garanti Bitecek */}
         <div className="col-md-4 mb-3">
           <div className="card shadow-lg border-primary h-100">
             <div className="card-header bg-primary text-white">
-              <h5 className="fw-semibold mb-0">Yakında Garanti Bitecek</h5>
+              <h5 className="fw-semibold mb-0">Garanti Durumu</h5>
             </div>
             <div className="card-body">
               {garantiYaklasan.length === 0 ? (
                 <p className="text-center text-muted mb-0">
-                  Yaklaşan garanti bulunmuyor.
+                  Garanti kaydı bulunmuyor.
                 </p>
               ) : (
                 garantiYaklasan.map((urun) => {
@@ -271,9 +240,15 @@ function GostergePaneli() {
                         {urun.brand} {urun.model}
                       </small>
                       <br />
-                      <span className="badge bg-primary">
-                        {kalanGun} Gün Kaldı
-                      </span>
+                      {kalanGun < 0 ? (
+                        <span className="badge bg-danger">
+                          ❌ {Math.abs(kalanGun)} Gün Önce Bitti
+                        </span>
+                      ) : (
+                        <span className="badge bg-warning text-dark">
+                          🛡️ {kalanGun} Gün Kaldı
+                        </span>
+                      )}
                     </div>
                   );
                 })
@@ -283,7 +258,7 @@ function GostergePaneli() {
         </div>
       </div>
 
-      {/* TABLOLAR */}
+      {/* Son Yapılan Bakımlar */}
       <div className="card shadow-lg border-0 mt-4">
         <div className="card-header">
           <h5 className="fw-semibold mb-0">Son Yapılan Bakımlar</h5>
@@ -330,6 +305,7 @@ function GostergePaneli() {
         </div>
       </div>
 
+      {/* Son Ürün Hareketleri */}
       <div className="card shadow-lg border-0 mt-4">
         <div className="card-header bg-dark text-white">
           <h5 className="fw-semibold mb-0">Son Ürün Hareketleri</h5>

@@ -22,67 +22,63 @@ namespace BakimAPI.Controllers
         {
             var dashboard = new DashboardDto();
 
-            dashboard.TotalProducts =
-                await _context.Products.CountAsync();
+            // 1. Sayısal Özet Verileri
+            dashboard.TotalProducts = await _context.Products.CountAsync();
 
-            dashboard.ProductsInMaintenance =
-                await _context.Products.CountAsync(x => x.IsInMaintenance);
+            dashboard.ProductsInMaintenance = await _context.Products
+                .CountAsync(x => x.IsInMaintenance);
 
-            dashboard.TotalEmployees =
-                await _context.Employees.CountAsync();
+            dashboard.TotalEmployees = await _context.Employees.CountAsync();
 
-            dashboard.TotalMaintenances =
-                await _context.Maintenances.CountAsync();
+            dashboard.TotalMaintenances = await _context.Maintenances.CountAsync();
 
-            dashboard.UpcomingMaintenances =
-                await _context.Products.CountAsync(x =>
+            dashboard.UpcomingMaintenances = await _context.Products
+                .CountAsync(x =>
                     x.NextMaintenanceDate.HasValue &&
                     x.NextMaintenanceDate.Value >= DateTime.Today &&
                     x.NextMaintenanceDate.Value <= DateTime.Today.AddDays(30));
 
-            dashboard.OverdueMaintenances =
-                await _context.Products.CountAsync(x =>
+            dashboard.OverdueMaintenances = await _context.Products
+                .CountAsync(x =>
                     x.NextMaintenanceDate.HasValue &&
                     x.NextMaintenanceDate.Value < DateTime.Today);
 
-            dashboard.LastMaintenances =
-                await _context.Maintenances
-                    .Include(x => x.Product)
-                    .Include(x => x.Employee)
-                    .OrderByDescending(x => x.MaintenanceDate)
-                    .Take(5)
-                    .ToListAsync();
+            // 2. Liste Verileri
+            dashboard.LastMaintenances = await _context.Maintenances
+                .Include(x => x.Product)
+                .Include(x => x.Employee)
+                .OrderByDescending(x => x.MaintenanceDate)
+                .Take(5)
+                .ToListAsync();
 
-            dashboard.UpcomingProducts =
-                await _context.Products
-                    .Where(x =>
-                        x.NextMaintenanceDate.HasValue &&
-                        x.NextMaintenanceDate.Value >= DateTime.Today &&
-                        x.NextMaintenanceDate.Value <= DateTime.Today.AddDays(30))
-                    .OrderBy(x => x.NextMaintenanceDate)
-                    .Take(5)
-                    .ToListAsync();
+            dashboard.UpcomingProducts = await _context.Products
+                .Where(x =>
+                    x.NextMaintenanceDate.HasValue &&
+                    x.NextMaintenanceDate.Value >= DateTime.Today &&
+                    x.NextMaintenanceDate.Value <= DateTime.Today.AddDays(30))
+                .OrderBy(x => x.NextMaintenanceDate)
+                .Take(5)
+                .ToListAsync();
 
-            dashboard.UpcomingWarrantyProducts =
-                await _context.Products
-                    .Where(x =>
-                        !x.IsDeleted &&
-                        x.WarrantyEndDate != default &&
-                        x.WarrantyEndDate >= DateTime.Today &&
-                        x.WarrantyEndDate <= DateTime.Today.AddDays(30))
-                    .OrderBy(x => x.WarrantyEndDate)
-                    .Take(5)
-                    .ToListAsync();
+            // Güncellenen Garanti Sorgusu (Take 10)
+            dashboard.UpcomingWarrantyProducts = await _context.Products
+                .Where(x =>
+                    !x.IsDeleted &&
+                    x.WarrantyEndDate != default &&
+                    x.WarrantyEndDate <= DateTime.Today.AddDays(30))
+                .OrderBy(x => x.WarrantyEndDate)
+                .Take(10)
+                .ToListAsync();
 
-            dashboard.OverdueProducts =
-                await _context.Products
-                    .Where(x =>
-                        x.NextMaintenanceDate.HasValue &&
-                        x.NextMaintenanceDate.Value < DateTime.Today)
-                    .OrderBy(x => x.NextMaintenanceDate)
-                    .Take(5)
-                    .ToListAsync();
+            dashboard.OverdueProducts = await _context.Products
+                .Where(x =>
+                    x.NextMaintenanceDate.HasValue &&
+                    x.NextMaintenanceDate.Value < DateTime.Today)
+                .OrderBy(x => x.NextMaintenanceDate)
+                .Take(5)
+                .ToListAsync();
 
+            // 3. Grafik (Aylık Bakım Sayıları) Verileri
             dashboard.MonthlyLabels = new List<string>();
             dashboard.MonthlyMaintenanceCounts = new List<int>();
 
@@ -90,9 +86,7 @@ namespace BakimAPI.Controllers
             {
                 var tarih = DateTime.Today.AddMonths(-i);
 
-                dashboard.MonthlyLabels.Add(
-                    tarih.ToString("MMM")
-                );
+                dashboard.MonthlyLabels.Add(tarih.ToString("MMM"));
 
                 var adet = await _context.Maintenances.CountAsync(x =>
                     x.MaintenanceDate.Month == tarih.Month &&
@@ -101,11 +95,56 @@ namespace BakimAPI.Controllers
                 dashboard.MonthlyMaintenanceCounts.Add(adet);
             }
 
-            dashboard.LastProductActions =
-                await _context.ProductHistories
-                    .OrderByDescending(x => x.Date)
-                    .Take(10)
-                    .ToListAsync();
+            dashboard.LastProductActions = await _context.ProductHistories
+                .OrderByDescending(x => x.Date)
+                .Take(10)
+                .ToListAsync();
+
+            // 4. BİLDİRİMLER (Notifications)
+            dashboard.Notifications = new List<NotificationDto>();
+
+            // Günü Geçen Bakımlar Bildirimleri
+            foreach (var urun in dashboard.OverdueProducts)
+            {
+                dashboard.Notifications.Add(new NotificationDto
+                {
+                    Title = urun.ProductName,
+                    Message = "Bu ürünün bakım tarihi geçmiş durumda!",
+                    Type = "danger",
+                    Icon = "⚠️"
+                });
+            }
+            foreach (var urun in dashboard.UpcomingWarrantyProducts)
+            {
+                var kalanGun = (urun.WarrantyEndDate - DateTime.Today).Days;
+
+                if (kalanGun >= 0)
+                {
+                    dashboard.Notifications.Add(new NotificationDto
+                    {
+                        Title = urun.ProductName,
+                        Message = $"Ürünün garantisi {kalanGun} gün sonra sona erecek.",
+                        Type = "warning",
+                        Icon = "🛡️"
+                    });
+                }
+                else
+                {
+                    dashboard.Notifications.Add(new NotificationDto
+                    {
+                        Title = urun.ProductName,
+                        Message = $"Ürünün garantisi {Math.Abs(kalanGun)} gün önce sona erdi.",
+                        Type = "danger",
+                        Icon = "❌"
+                    });
+                }
+            }
+            Console.WriteLine("Bildirim Sayısı : " + dashboard.Notifications.Count);
+
+            foreach (var item in dashboard.Notifications)
+            {
+                Console.WriteLine($"{item.Title} - {item.Message}");
+            }
 
             return Ok(dashboard);
         }

@@ -24,6 +24,7 @@ namespace BakimAPI.Controllers
 
             var products = _context.Products.ToList();
 
+            // 1. Bakım Bildirimleri
             foreach (var product in products)
             {
                 if (product.NextMaintenanceDate == null)
@@ -58,6 +59,47 @@ namespace BakimAPI.Controllers
                     });
                 }
             }
+
+            // 2. Garanti Bildirimleri
+            foreach (var product in products)
+            {
+                if (product.WarrantyEndDate == default)
+                    continue;
+
+                var days = (product.WarrantyEndDate.Date - today).Days;
+
+                if (days < 0)
+                {
+                    notifications.Add(new
+                    {
+                        id = 100000 + product.Id,
+                        type = "danger",
+                        icon = "❌",
+                        title = product.ProductName,
+                        message = $"{product.ProductName} garantisi {Math.Abs(days)} gün önce bitti.",
+                        qrCode = product.QrCode,
+                        isRead = false
+                    });
+                }
+                else if (days <= 30)
+                {
+                    notifications.Add(new
+                    {
+                        id = 200000 + product.Id,
+                        type = "warning",
+                        icon = "🛡️",
+                        title = product.ProductName,
+                        message = $"{product.ProductName} garantisi {days} gün sonra bitecek.",
+                        qrCode = product.QrCode,
+                        isRead = false
+                    });
+                }
+            }
+
+            // Kritik (danger) bildirimleri en üstte tutacak sıralama
+            notifications = notifications
+                .OrderByDescending(x => ((dynamic)x).type == "danger")
+                .ToList();
 
             return Ok(notifications);
         }
