@@ -83,8 +83,6 @@ function GostergePaneli() {
           </small>
         </div>
       </div>
-
-      {/* İstatistik Kartları */}
       <div className="row">
         <div className="col-md-3 mb-3">
           <div className="card shadow-lg border-0 h-100">
@@ -119,8 +117,6 @@ function GostergePaneli() {
           </div>
         </div>
       </div>
-
-      {/* Bakım Durumları */}
       <div className="row">
         <div className="col-md-6 mb-3">
           <div className="card border-success shadow-lg h-100">
@@ -143,8 +139,6 @@ function GostergePaneli() {
           </div>
         </div>
       </div>
-
-      {/* Grafik */}
       <div className="card shadow-lg border-0">
         <div className="card-header">
           <h5 className="fw-semibold mb-0">Son 6 Ay Bakım Grafiği</h5>
@@ -153,8 +147,6 @@ function GostergePaneli() {
           <Line data={grafikVerisi} />
         </div>
       </div>
-
-      {/* Detay Kartları */}
       <div className="row mt-4">
         <div className="col-md-4 mb-3">
           <div className="card shadow-lg border-success h-100">
@@ -257,8 +249,6 @@ function GostergePaneli() {
           </div>
         </div>
       </div>
-
-      {/* Son Yapılan Bakımlar */}
       <div className="card shadow-lg border-0 mt-4">
         <div className="card-header">
           <h5 className="fw-semibold mb-0">Son Yapılan Bakımlar</h5>
@@ -304,8 +294,6 @@ function GostergePaneli() {
           </table>
         </div>
       </div>
-
-      {/* Son Ürün Hareketleri */}
       <div className="card shadow-lg border-0 mt-4">
         <div className="card-header bg-dark text-white">
           <h5 className="fw-semibold mb-0">Son Ürün Hareketleri</h5>

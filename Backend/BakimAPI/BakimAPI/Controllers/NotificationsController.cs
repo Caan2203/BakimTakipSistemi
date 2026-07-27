@@ -23,8 +23,6 @@ namespace BakimAPI.Controllers
             var notifications = new List<object>();
 
             var products = _context.Products.ToList();
-
-            // 1. Bakım Bildirimleri
             foreach (var product in products)
             {
                 if (product.NextMaintenanceDate == null)
@@ -59,8 +57,6 @@ namespace BakimAPI.Controllers
                     });
                 }
             }
-
-            // 2. Garanti Bildirimleri
             foreach (var product in products)
             {
                 if (product.WarrantyEndDate == default)
@@ -95,8 +91,6 @@ namespace BakimAPI.Controllers
                     });
                 }
             }
-
-            // Kritik (danger) bildirimleri en üstte tutacak sıralama
             notifications = notifications
                 .OrderByDescending(x => ((dynamic)x).type == "danger")
                 .ToList();

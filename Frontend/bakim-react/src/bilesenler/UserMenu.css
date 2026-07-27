@@ -341,3 +341,19 @@ body.dark .user-dropdown hr {
 body.dark .menu-title {
     color: #9ca3af;
 }
+.summary-item{
+    cursor:pointer;
+    padding:12px;
+    margin:4px 0;
+    border-radius:10px;
+    transition:all .25s ease;
+}
+
+.summary-item:hover{
+    background:#2d2d2d;
+    transform:translateX(5px);
+}
+
+.summary-item:active{
+    transform:scale(.98);
+}

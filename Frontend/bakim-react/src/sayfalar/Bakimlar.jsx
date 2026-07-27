@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
 
 import {
@@ -13,6 +14,10 @@ import { urunleriGetir } from "../services/urunServisi";
 import { personelleriGetir } from "../services/personelServisi";
 
 function Bakimlar() {
+    const [searchParams] = useSearchParams();
+    const durum = searchParams.get("durum");
+    const filter = searchParams.get("filter");
+
     const [bakimlar, setBakimlar] = useState([]);
     const [urunler, setUrunler] = useState([]);
     const [personeller, setPersoneller] = useState([]);
@@ -108,7 +113,6 @@ function Bakimlar() {
                     status: yeniUrun.status
                 };
             }
-            console.log("Gönderilen bakım =", yeniBakim);
             
             if (duzenlemeModu) {
                 await bakimGuncelle(yeniUrun.id, yeniBakim);
@@ -174,12 +178,31 @@ function Bakimlar() {
         }
     };
 
+    let filtreliBakimlar = bakimlar;
+    
+    if (filter === "geciken") {
+        filtreliBakimlar = bakimlar.filter(x => x.status !== "Tamamlandı");
+    }
+
+    if (durum === "tamamlandi") {
+        filtreliBakimlar = bakimlar.filter(
+            x => x.status?.toLowerCase() === "tamamlandı"
+        );
+    }
+    if (durum === "bekleyen") {
+        filtreliBakimlar = bakimlar.filter(
+            x =>
+                x.status?.toLowerCase() === "bekliyor" ||
+                x.status?.toLowerCase() === "gecikti"
+        );
+    }
+
     const toplamBakim = bakimlar.length;
     const tamamlananBakim = bakimlar.filter(b => b.status === "Tamamlandı").length;
     const devamEdenBakim = bakimlar.filter(b => b.status === "Devam Ediyor").length;
     const bekleyenBakim = bakimlar.filter(b => b.status === "Bekliyor" || !b.status).length;
 
-    const filtrelenmisBakimlar = bakimlar.filter((bakim) => {
+    const filtrelenmisBakimlar = filtreliBakimlar.filter((bakim) => {
         const urun = urunler.find(u => u.id === bakim.productId);
         const personel = personeller.find(p => p.id === bakim.employeeId);
 
@@ -211,11 +234,11 @@ function Bakimlar() {
     const ilkKayitIndeksi = sonKayitIndeksi - sayfaBasinaKayit;
     const gecerliBakimlar = filtrelenmisBakimlar.slice(ilkKayitIndeksi, sonKayitIndeksi);
     const toplamSayfaSayisi = Math.ceil(filtrelenmisBakimlar.length / sayfaBasinaKayit);
-            
+        
     return (
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>🛠️Bakım Yönetimi</h2>
+                <h2>🛠️ Bakım Yönetimi</h2>
                 <div className="d-flex gap-2">
                     <input
                         type="text"
@@ -360,7 +383,6 @@ function Bakimlar() {
                                         <button
                                             className="btn btn-warning btn-sm me-2"
                                             onClick={() => {
-                                                console.log("Bakım =", bakim);
                                                 setDuzenlemeModu(true);
                                                 setModalAcik(true);
                                                 setYeniUrun({
@@ -380,17 +402,10 @@ function Bakimlar() {
                                             Düzenle
                                         </button>
                                         <button
-                                            className="btn btn-danger btn-sm me-2"
+                                            className="btn btn-danger btn-sm"
                                             onClick={() => bakimiSil(bakim.id)}
                                         >
                                             Sil
-                                        </button>
-                                        <button
-                                            className="btn btn-primary btn-sm"
-                                            onClick={() => window.open(`/qr-kod/${urun.qrCode}`, "_blank")}
-                                            disabled={!urun.qrCode}
-                                        >
-                                            Bilgi + Bakım Yap
                                         </button>
                                     </td>
                                 </tr>

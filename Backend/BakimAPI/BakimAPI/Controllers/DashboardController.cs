@@ -21,8 +21,6 @@ namespace BakimAPI.Controllers
         public async Task<ActionResult<DashboardDto>> GetDashboard()
         {
             var dashboard = new DashboardDto();
-
-            // 1. Sayısal Özet Verileri
             dashboard.TotalProducts = await _context.Products.CountAsync();
 
             dashboard.ProductsInMaintenance = await _context.Products
@@ -42,8 +40,6 @@ namespace BakimAPI.Controllers
                 .CountAsync(x =>
                     x.NextMaintenanceDate.HasValue &&
                     x.NextMaintenanceDate.Value < DateTime.Today);
-
-            // 2. Liste Verileri
             dashboard.LastMaintenances = await _context.Maintenances
                 .Include(x => x.Product)
                 .Include(x => x.Employee)
@@ -59,8 +55,6 @@ namespace BakimAPI.Controllers
                 .OrderBy(x => x.NextMaintenanceDate)
                 .Take(5)
                 .ToListAsync();
-
-            // Güncellenen Garanti Sorgusu (Take 10)
             dashboard.UpcomingWarrantyProducts = await _context.Products
                 .Where(x =>
                     !x.IsDeleted &&
@@ -77,8 +71,6 @@ namespace BakimAPI.Controllers
                 .OrderBy(x => x.NextMaintenanceDate)
                 .Take(5)
                 .ToListAsync();
-
-            // 3. Grafik (Aylık Bakım Sayıları) Verileri
             dashboard.MonthlyLabels = new List<string>();
             dashboard.MonthlyMaintenanceCounts = new List<int>();
 
@@ -99,11 +91,7 @@ namespace BakimAPI.Controllers
                 .OrderByDescending(x => x.Date)
                 .Take(10)
                 .ToListAsync();
-
-            // 4. BİLDİRİMLER (Notifications)
             dashboard.Notifications = new List<NotificationDto>();
-
-            // Günü Geçen Bakımlar Bildirimleri
             foreach (var urun in dashboard.OverdueProducts)
             {
                 dashboard.Notifications.Add(new NotificationDto

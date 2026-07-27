@@ -338,7 +338,7 @@ function Urunler() {
                                                 <td style={hucreStili}>
                                                     {tarihFormatlaTR(urun.nextMaintenanceDate)}
                                                 </td>
-                                                {/* Garanti Bitiş Tarihi Tablo Sütunu (GG.AA.YYYY) */}
+                                                
                                                 <td style={hucreStili}>
                                                     {tarihFormatlaTR(urun.warrantyEndDate)}
                                                 </td>

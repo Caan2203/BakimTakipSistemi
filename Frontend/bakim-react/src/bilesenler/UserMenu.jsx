@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./UserMenu.css";
 import ProfilModal from "./ProfilModal";
 import SifreDegistirModal from "./SifreDegistirModal";
@@ -10,8 +11,10 @@ export default function UserMenu() {
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [timeAgo, setTimeAgo] = useState("");
     
+    const navigate = useNavigate();
     const ref = useRef(null);
     const lastLogin = localStorage.getItem("lastLogin");
+    
     useEffect(() => {
         const close = (e) => {
             if (ref.current && !ref.current.contains(e.target)) {
@@ -22,6 +25,7 @@ export default function UserMenu() {
         document.addEventListener("mousedown", close);
         return () => document.removeEventListener("mousedown", close);
     }, []);
+
     useEffect(() => {
         const updateTime = () => {
             if (!lastLogin) {
@@ -66,6 +70,7 @@ export default function UserMenu() {
 
         return () => clearInterval(timer);
     }, [lastLogin]);
+
     const handleLogout = () => {
         localStorage.clear();
         window.location.reload();
@@ -158,21 +163,37 @@ export default function UserMenu() {
                         <b>{timeAgo}</b>
                     </div>
 
-                    <div className="summary-item">
-                        <i className="bi bi-box-seam me-2"></i>
-                        <span>Yönetilen Ürün</span>
+                    <div
+                        className="summary-item d-flex justify-content-between align-items-center"
+                        onClick={() => navigate("/urunler")}
+                    >
+                        <div>
+                            <i className="bi bi-box-seam me-2"></i>
+                            <span>Yönetilen Ürün</span>
+                        </div>
                         <b>10</b>
                     </div>
 
-                    <div className="summary-item">
-                        <i className="bi bi-tools me-2"></i>
-                        <span>Tamamlanan Bakım</span>
+                    <div
+                        className="summary-item d-flex justify-content-between align-items-center"
+                        onClick={() => navigate("/bakimlar?durum=tamamlandi")}
+                    >
+                        <div>
+                            <i className="bi bi-tools me-2"></i>
+                            <span>Tamamlanan Bakım</span>
+                        </div>
                         <b>14</b>
                     </div>
 
-                    <div className="summary-item">
-                        <i className="bi bi-exclamation-triangle me-2"></i>
-                        <span>Bekleyen İşlem</span>
+                    <div
+                        className="summary-item d-flex justify-content-between align-items-center"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => navigate("/bakimlar?durum=bekleyen")}
+                    >
+                        <div>
+                            <i className="bi bi-exclamation-triangle me-2"></i>
+                            <span>Bekleyen İşlem</span>
+                        </div>
                         <b className="danger text-danger">1</b>
                     </div>
 
